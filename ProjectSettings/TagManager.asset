@@ -7,6 +7,10 @@ TagManager:
   - IntroUI
   - PlayUI
   - EndUI
+  - BaseRed
+  - BaseBlue
+  - Canvas
+  - BaseGroup
   layers:
   - Default
   - TransparentFX

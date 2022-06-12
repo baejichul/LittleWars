@@ -9,80 +9,118 @@ public class GameManager : MonoBehaviour
     public bool _isClearHard;
 
     public ConfigManager _cfgMgr;
+    GameObject _canvas;
+    GameObject _baseGroup;
+
     public GameObject _introUI;
     public GameObject _playUI;
     public GameObject _endUI;
 
-    public UIMode _uiMode;
-    public Difficulty _difficulty;
-    private float titleSetVal = 0.0f;
+    public GameObject _camera;
+
+    public UIMODE _uiMode;
+    public DIFFICULTY _difficulty;
+
+    float _titleSetVal = 0.0f;
+    int _cameraPosX = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         _cfgMgr = FindObjectOfType<ConfigManager>();
+        _camera = GameObject.FindGameObjectWithTag("MainCamera");
+
+        InitGameUIObject();
         InitGame();
     }
 
     // Update is called once per frame
     void Update()
     {   
-        moveTitleSet();
-    }    
+        MoveTitleSet();
+        MoveCamera();
+    }
 
     void InitGame()
-    {
-        InitGameUIObject();
+    {   
+        if (_introUI != null)
+            InitGame(DIFFICULTY.EASY);
+    }
+
+    void InitGame(DIFFICULTY df)
+    {   
         if (_introUI != null)
         {
-            _uiMode = UIMode.INTRO;
-            setActiveClearImage();
+            _uiMode = UIMODE.INTRO;
+            _difficulty = df;
+
+            _introUI.SetActive(true);
+            _playUI.SetActive(false);
+            _endUI.SetActive(false);
+
+            setActiveBase(false);
+            SetActiveClearImage();
         }
     }
 
     public void InitGameUIObject()
     {
-        _introUI = GameObject.FindWithTag("IntroUI");
-        _playUI  = GameObject.FindWithTag("PlayUI");
-        _endUI   = GameObject.FindWithTag("EndUI");
+        _canvas = GameObject.FindGameObjectWithTag("Canvas");
+        _introUI = _canvas.transform.Find("IntroUI").gameObject;
+        _playUI  = _canvas.transform.Find("PlayUI").gameObject;
+        _endUI   = _canvas.transform.Find("EndUI").gameObject;
     }
 
-    public void playGame()
+    public void PlayGame()
+    {
+        if (_playUI != null)
+            PlayGame(DIFFICULTY.EASY);
+    }
+
+    public void PlayGame(DIFFICULTY df)
     {
         if (_playUI != null)
         {
-            _uiMode = UIMode.PLAY;
-            _difficulty = Difficulty.EASY;
-        }
-    }
-
-    public void playGame(Difficulty df)
-    {
-        if (_playUI != null)
-        {
-            _uiMode = UIMode.PLAY;
+            _uiMode = UIMODE.PLAY;
             _difficulty = df;
-            //Debug.Log(_uiMode.ToString() + " : " + df.ToString());
+            
+            _introUI.SetActive(false);
+            _playUI.SetActive(true);
+            _endUI.SetActive(false);
+
+            setActiveBase(true);
         }
     }
 
-    public void endGame()
+    public void EndGame()
+    {
+        if (_endUI != null)
+            EndGame(DIFFICULTY.EASY);
+    }
+
+    public void EndGame(DIFFICULTY df)
     {
         if (_endUI != null)
         {
-            _uiMode = UIMode.END;
+            _uiMode = UIMODE.END;
+            _difficulty = df;
+
+            _introUI.SetActive(false);
+            _playUI.SetActive(false);
+            _endUI.SetActive(true);
         }
     }
 
-    public GameObject getGameUIObject(string uiName)
+    public GameObject GetGameUIObject(string uiName)
     {
-        return GameObject.FindWithTag(uiName);
+        _canvas = GameObject.FindGameObjectWithTag("Canvas");
+        return _canvas.transform.Find(uiName).gameObject;
     }
 
     // 난이도 클리어 설정
-    void setActiveClearImage()
+    void SetActiveClearImage()
     {
-        if (_uiMode == UIMode.INTRO)
+        if (_uiMode == UIMODE.INTRO)
         {
             Transform btnEasyTf = _introUI.transform.Find("ButtonEasy");
             if (btnEasyTf != null)
@@ -98,19 +136,75 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // 타이틀셋 애니메이션
-    void moveTitleSet()
+    void setActiveBase(bool flag) 
     {
-        if (_uiMode == UIMode.INTRO)
+        _baseGroup = GameObject.FindGameObjectWithTag("BaseGroup");
+        if (_baseGroup != null)
         {
-            titleSetVal = titleSetVal + 0.015f;
-            // Debug.Log("val = " + titleSetVal + " : Mathf.Sin(val) = " + Mathf.Sin(titleSetVal));
-            Transform titleTf = _introUI.transform.Find("TitleSet");
-            if (titleTf != null)
-                titleTf.Translate(new Vector3(0.0f, Mathf.Sin(titleSetVal) * 0.15f, 0.0f));
+            GameObject baseBlue = _baseGroup.transform.Find("BaseBlue").gameObject;
+            if (baseBlue != null)
+                baseBlue.SetActive(flag);
+
+            GameObject baseRed = _baseGroup.transform.Find("BaseRed").gameObject;
+            if (baseRed != null)
+                baseRed.SetActive(flag);
         }
     }
 
+    // 타이틀셋 애니메이션
+    void MoveTitleSet()
+    {
+        if (_uiMode == UIMODE.INTRO)
+        {
+            _titleSetVal = _titleSetVal + 0.015f;
+            // Debug.Log("val = " + titleSetVal + " : Mathf.Sin(val) = " + Mathf.Sin(titleSetVal));
+            Transform titleTf = _introUI.transform.Find("TitleSet");
+            if (titleTf != null)
+                titleTf.Translate(new Vector3(0.0f, Mathf.Sin(_titleSetVal) * 0.15f, 0.0f));
+        }
+    }
 
-    
+    public void MoveCameraPosX(POINTER pt, DIRECTION dir)
+    {
+        // Debug.Log("test : " + pt.ToString() + " : " + dir);
+        if (_uiMode == UIMODE.PLAY)
+        {
+            int speed = _cfgMgr.cameraSpeed;
+
+            if (dir == DIRECTION.LEFT)
+            {
+                if (pt == POINTER.DOWN)
+                    _cameraPosX -= speed;
+                else if (pt == POINTER.UP)
+                    _cameraPosX += speed;
+            }
+            else if (dir == DIRECTION.RIGHT)
+            {
+                if (pt == POINTER.DOWN)
+                    _cameraPosX += speed;
+                else if (pt == POINTER.UP)
+                    _cameraPosX -= speed;
+            }
+        }
+        
+    }
+
+    void MoveCamera()
+    {
+        if (_uiMode == UIMODE.PLAY)
+        {
+            Vector3 cameraPos = _camera.transform.position;
+            float posX = cameraPos.x;
+
+            if (posX <= _cfgMgr.cameraMinPosx)
+                posX = _cfgMgr.cameraMinPosx;
+                
+            if (posX >= _cfgMgr.cameraMaxPosX)
+                posX = _cfgMgr.cameraMaxPosX;
+
+            _camera.transform.position = new Vector3(posX, cameraPos.y, cameraPos.z);
+            _camera.transform.Translate(new Vector3(_cameraPosX * Time.deltaTime, 0.0f, 0.0f));
+        }
+            
+    }
 }
