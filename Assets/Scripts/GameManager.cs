@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public GameObject _endUI;
 
     public UIMode _uiMode;
+    public Difficulty _difficulty;
     private float titleSetVal = 0.0f;
 
     // Start is called before the first frame update
@@ -46,14 +47,36 @@ public class GameManager : MonoBehaviour
         _endUI   = GameObject.FindWithTag("EndUI");
     }
 
-    void playGame()
-    {   
-        _uiMode = UIMode.PLAY;
+    public void playGame()
+    {
+        if (_playUI != null)
+        {
+            _uiMode = UIMode.PLAY;
+            _difficulty = Difficulty.EASY;
+        }
     }
 
-    void endGame()
-    {   
-        _uiMode = UIMode.END;
+    public void playGame(Difficulty df)
+    {
+        if (_playUI != null)
+        {
+            _uiMode = UIMode.PLAY;
+            _difficulty = df;
+            //Debug.Log(_uiMode.ToString() + " : " + df.ToString());
+        }
+    }
+
+    public void endGame()
+    {
+        if (_endUI != null)
+        {
+            _uiMode = UIMode.END;
+        }
+    }
+
+    public GameObject getGameUIObject(string uiName)
+    {
+        return GameObject.FindWithTag(uiName);
     }
 
     // 난이도 클리어 설정
@@ -84,11 +107,10 @@ public class GameManager : MonoBehaviour
             // Debug.Log("val = " + titleSetVal + " : Mathf.Sin(val) = " + Mathf.Sin(titleSetVal));
             Transform titleTf = _introUI.transform.Find("TitleSet");
             if (titleTf != null)
-            {
                 titleTf.Translate(new Vector3(0.0f, Mathf.Sin(titleSetVal) * 0.15f, 0.0f));
-            }
         }
-
-
     }
+
+
+    
 }
