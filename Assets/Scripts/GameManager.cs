@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public ConfigManager _cfgMgr;
     GameObject _canvas;
     GameObject _baseGroup;
+    GameObject _backGroup;
 
     public GameObject _introUI;
     public GameObject _playUI;
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
 
     float _titleSetVal = 0.0f;
     int _cameraPosX = 0;
+    bool _isCarmeraMove = true;
 
     // Start is called before the first frame update
     void Start()
@@ -39,6 +41,11 @@ public class GameManager : MonoBehaviour
     {   
         MoveTitleSet();
         MoveCamera();
+    }
+
+    private void LateUpdate()
+    {
+        MoveBackground();
     }
 
     void InitGame()
@@ -166,7 +173,6 @@ public class GameManager : MonoBehaviour
 
     public void MoveCameraPosX(POINTER pt, DIRECTION dir)
     {
-        // Debug.Log("test : " + pt.ToString() + " : " + dir);
         if (_uiMode == UIMODE.PLAY)
         {
             int speed = _cfgMgr.cameraSpeed;
@@ -186,25 +192,55 @@ public class GameManager : MonoBehaviour
                     _cameraPosX -= speed;
             }
         }
-        
+
+        // Debug.LogFormat("POINTER : {0},  DIRECTION : {1}, _cameraPosX : {2}", pt.ToString() , dir.ToString(), _cameraPosX);
+
     }
 
     void MoveCamera()
     {
         if (_uiMode == UIMODE.PLAY)
-        {
+        {   
+            // 카메라 좌우측 최소/최대 위치 지정
             Vector3 cameraPos = _camera.transform.position;
             float posX = cameraPos.x;
+            _isCarmeraMove = true;
 
             if (posX <= _cfgMgr.cameraMinPosx)
+            {
                 posX = _cfgMgr.cameraMinPosx;
+                _isCarmeraMove = false;
+            }
+                
                 
             if (posX >= _cfgMgr.cameraMaxPosX)
+            {
                 posX = _cfgMgr.cameraMaxPosX;
-
+                _isCarmeraMove = false;
+            }
+                
             _camera.transform.position = new Vector3(posX, cameraPos.y, cameraPos.z);
+
+            // 카메라 이동
             _camera.transform.Translate(new Vector3(_cameraPosX * Time.deltaTime, 0.0f, 0.0f));
+        }   
+    }
+
+    void MoveBackground()
+    {
+        _backGroup = GameObject.FindGameObjectWithTag("BackGroup");
+        if (_backGroup != null && _isCarmeraMove == true)
+        {
+            GameObject backTree = _backGroup.transform.Find("Tree").gameObject;
+            if (backTree != null)
+                backTree.transform.Translate(new Vector3(_cameraPosX * _cfgMgr.bgTreeSpeed * Time.deltaTime, 0.0f, 0.0f));
+
+            GameObject backForrest = _backGroup.transform.Find("Forrest").gameObject;
+            if (backForrest != null)
+                backForrest.transform.Translate(new Vector3(_cameraPosX * _cfgMgr.bgForrestSpeed * Time.deltaTime, 0.0f, 0.0f));
+            GameObject backSky = _backGroup.transform.Find("Sky").gameObject;
+            if (backSky != null)
+                backSky.transform.Translate(new Vector3(_cameraPosX * _cfgMgr.bgSkySpeed * Time.deltaTime, 0.0f, 0.0f));
         }
-            
     }
 }
