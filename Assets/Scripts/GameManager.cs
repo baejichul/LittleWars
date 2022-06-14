@@ -238,9 +238,11 @@ public class GameManager : MonoBehaviour
             GameObject backForrest = _backGroup.transform.Find("Forrest").gameObject;
             if (backForrest != null)
                 backForrest.transform.Translate(new Vector3(_cameraPosX * _cfgMgr.bgForrestSpeed * Time.deltaTime, 0.0f, 0.0f));
+                
             GameObject backSky = _backGroup.transform.Find("Sky").gameObject;
             if (backSky != null)
                 backSky.transform.Translate(new Vector3(_cameraPosX * _cfgMgr.bgSkySpeed * Time.deltaTime, 0.0f, 0.0f));
+                
         }
     }
 }

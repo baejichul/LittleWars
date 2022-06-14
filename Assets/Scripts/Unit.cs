@@ -6,22 +6,14 @@ using UnityEngine.EventSystems;
 
 public class Unit : MonoBehaviour
 {
-    float _speed = 1.0f;
-    float _attackRange = 0.7f; // 0.4f 2.5f 3.5f
-    public int _hp = 0;
-    public int _maxHp = 100;
-    public int _power = 1;
-    GameObject[] _enemyObj;
+    protected float _tmpSpeed;
+    protected bool _isAttacking = false;
 
-    bool _isAttacking = false;
-
-    TEAM _team;
-    UNIT_CLASS _unitClass;
-
-    GameManager _gMgr;
-    GameObject _dust;
-    Animator _ani;
-    ParticleSystem _ps;
+    protected GameManager _gMgr;
+    protected UnitConfig _unitConfig;
+    protected GameObject _dust;
+    protected Animator _ani;
+    protected ParticleSystem _ps;
 
     // Start is called before the first frame update
     void Start()
@@ -31,35 +23,20 @@ public class Unit : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {   
-        move();
+    {
+        doMove();
     }
 
+    // 유닛 초기화
     void initUnit()
     {
-        _gMgr = FindObjectOfType<GameManager>();
-        // 팀 및 이동속도설정
-        if (gameObject.layer == (int)TEAM.BLUE)
-        {
-            _team = TEAM.BLUE;
-            _enemyObj = GameObject.FindGameObjectsWithTag(TEAM.RED.ToString());
-        }   
+        _gMgr       = FindObjectOfType<GameManager>();
+        _unitConfig = gameObject.AddComponent<UnitConfig>();
 
-        if (gameObject.layer == (int)TEAM.RED)
-        {
-            _team = TEAM.RED;
-            _enemyObj = GameObject.FindGameObjectsWithTag(TEAM.BLUE.ToString());
-            _speed = _speed * -1.0f;
-        }
-
-        // 종족설정
-        _unitClass = UNIT_CLASS.SWORD;
-
-        // 에너지 설정
-        _hp = _maxHp;
+        InitUnitConfig();
 
         // 파티클 설정
-        if(transform.Find("Dust") != null)
+        if (transform.Find("Dust") != null)
         {
             _dust = transform.Find("Dust").gameObject;
             _ps = _dust.GetComponent<ParticleSystem>();
@@ -67,45 +44,101 @@ public class Unit : MonoBehaviour
 
         // 애니메이터 설정
         _ani = GetComponent<Animator>();
-        _ani.SetTrigger("doMove");
     }
 
-    void move()
-    {       
+    protected virtual void InitUnitConfig()
+    {
+        // 종족설정
+        _unitConfig._unitClass = UNIT_CLASS.SWORD;
+
+        // 기본값 설정
+        _unitConfig._speed = 1.0f;
+        _unitConfig._attackRange = 0.7f; // 0.4f 2.5f 3.5f
+        _unitConfig._maxHp = 1000;
+        _unitConfig._power = 1;
+
+        // 에너지 설정
+        _unitConfig._hp = _unitConfig._maxHp;
+
+        // 팀 및 이동속도설정
+        if (gameObject.layer == (int)TEAM.BLUE)
+        {
+            _unitConfig._team = TEAM.BLUE;
+            _unitConfig._enemyObj = GameObject.FindGameObjectsWithTag(TEAM.RED.ToString());
+        }
+
+        if (gameObject.layer == (int)TEAM.RED)
+        {
+            _unitConfig._team = TEAM.RED;
+            _unitConfig._enemyObj = GameObject.FindGameObjectsWithTag(TEAM.BLUE.ToString());
+            _unitConfig._speed = _unitConfig._speed * -1.0f;
+        }
+    }
+
+    // 유닛 이동
+    void doMove()
+    {
         if (_ps != null && _gMgr._uiMode == UIMODE.PLAY)
-        {   
-            if (_enemyObj != null && _enemyObj.Length > 0)
+        {
+            if (_unitConfig._enemyObj != null && _unitConfig._enemyObj.Length > 0)
             {
                 GameObject enemy = FindEnemy();
-                doAttack(enemy);
+                if (enemy != null) doAttack(enemy);
             }
 
             if (_isAttacking == false)
             {
-                gameObject.transform.Translate(_speed * Time.deltaTime, 0.0f, 0.0f);
+                gameObject.transform.Translate(_unitConfig._speed * Time.deltaTime, 0.0f, 0.0f);
                 // ParticleSystem.EmissionModule em = _ps.emission;
                 // em.enabled = false;
                 if (!_ps.isEmitting)
                     _ps.Play();
             }
-        }            
+        }
     }
 
-    void stop()
+    void doStop(Collision2D collision)
     {
-        if (_ps != null && _gMgr._uiMode == UIMODE.PLAY)
+        if (_gMgr._uiMode == UIMODE.PLAY)
         {
-            _ps.Stop();
-        }            
+            // 뒤쪽 유닛만 1초간 정지 시킨다.
+            Vector3 gameVec = gameObject.transform.position;
+            Vector3 colVec = collision.gameObject.transform.position;
+
+            if (_unitConfig._team == TEAM.BLUE)
+            {
+                if (gameVec.x < colVec.x)       // 왼쪽
+                    StopUnit();
+            }
+            else
+            {
+                if (gameVec.x > colVec.x)       // 오른쪽
+                    StopUnit();
+            }
+        }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void StopUnit()
     {
-        // Debug.LogFormat("gameObject : {0} ,collision : {1}", gameObject.name, collision.gameObject.name);
+        if (_unitConfig._speed != 0.0f)
+        {
+            _tmpSpeed = _unitConfig._speed;
+            _unitConfig._speed = 0.0f;
+            Invoke("SetSpeed", 1.0f);
+        }
 
+        ParticleSystem ps = gameObject.transform.Find("Dust").GetComponent<ParticleSystem>();
+        if (!ps.isEmitting)
+            ps.Stop();
     }
 
-    // 가장 가까이 있는 적을 찾는다.
+    void SetSpeed()
+    {
+        _unitConfig._speed = _tmpSpeed;
+        // Debug.LogFormat("Nm : {0}, _speed : {1}", gameObject.name, _speed);
+    }
+
+    // 가장 가까이 있는 적 찾기
     GameObject FindEnemy()
     {
         float? minPosX = null;
@@ -113,24 +146,30 @@ public class Unit : MonoBehaviour
 
         Vector3 myObj = gameObject.transform.position;      
         float myPosX = myObj.x;
-        foreach ( GameObject obj in _enemyObj)
-        {   
-            Vector3 eyObj = obj.transform.position;
-            float posX = eyObj.x;
-            if (!minPosX.HasValue)
+        
+        foreach (GameObject obj in _unitConfig._enemyObj)
+        {
+            if (obj != null)
             {
-                minPosX = Mathf.Abs(myPosX - posX);
-                rtnObj = obj;
-            }
-            else if (minPosX > Mathf.Abs(myPosX - posX))
-            {
-                minPosX = Mathf.Abs(myPosX - posX);
-                rtnObj = obj;
+                Vector3 eyObj = obj.transform.position;
+                float posX = eyObj.x;
+                if (!minPosX.HasValue)
+                {
+                    minPosX = Mathf.Abs(myPosX - posX);
+                    rtnObj = obj;
+                }
+                else if (minPosX > Mathf.Abs(myPosX - posX))
+                {
+                    minPosX = Mathf.Abs(myPosX - posX);
+                    rtnObj = obj;
+                }
             }
         }
+        
         return rtnObj;
     }
 
+    // 공격
     void doAttack(GameObject enemyObj)
     {
         // 거리 측정
@@ -140,33 +179,53 @@ public class Unit : MonoBehaviour
         Vector3 vecCol = enemyObj.transform.position;
         float colPos = vecCol.x;
 
-        if (_attackRange >= Mathf.Abs(myPos - colPos))
+        if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
         {
-            _ani.SetTrigger("doAttack");
+            // Debug.LogFormat("gameObject : {0}, enemyObj: {1}", gameObject.name, enemyObj.name);
+            _ani.SetBool("LWAttack", true);
             _isAttacking = true;
-            doDamage(enemyObj, _power);
+            doDamage(enemyObj, _unitConfig._power);
+        }
+        else
+        {
+            _ani.SetBool("LWAttack", false);
         }
     }
 
+    // 데미지
     void doDamage(GameObject enemyObj, int damage)
     {
         Unit enemyUnit = enemyObj.GetComponent<Unit>();
-        enemyUnit._hp = enemyUnit._hp - damage;
-        enemyUnit._hp = Math.Max(enemyUnit._hp, 0);
+        enemyUnit._unitConfig._hp = enemyUnit._unitConfig._hp - damage;
+        enemyUnit._unitConfig._hp = Math.Max(enemyUnit._unitConfig._hp, 0);
+        enemyUnit._ani.SetTrigger("LWHit");
 
-        if (enemyUnit._hp == 0 )
-            doDie(enemyObj);
+        if (enemyUnit._unitConfig._hp == 0)
+            doDie(enemyUnit, enemyObj);
+            
     }
 
-    void doDie(GameObject enemyObj)
+    // 사망
+    void doDie(Unit enemyUnit, GameObject enemyObj)
     {
+        enemyUnit._ani.SetBool("LWDie", true);
         _isAttacking = false;
 
-        List<GameObject> list = new List<GameObject>(_enemyObj);
+        List<GameObject> list = new List<GameObject>(_unitConfig._enemyObj);
         list.Remove(enemyObj);
-        _enemyObj = list.ToArray();
+        _unitConfig._enemyObj = list.ToArray();
 
-        Destroy(enemyObj);
+
+        // enemyObj.GetComponent<BoxCollider2D>().enabled = false;
+        // enemyObj.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        Destroy(enemyObj,1.0f);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        // 충돌체가 아군이라면
+        if ( collision.gameObject.layer == (int)_unitConfig._team )            
+            doStop(collision);
     }
 
 }

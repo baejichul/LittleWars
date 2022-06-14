@@ -49,13 +49,13 @@ public class ConfigManager : MonoBehaviour
 {
     // camera
     public int cameraSpeed {get; set;} = 2;
-    public float cameraMinPosx { get; set; } = -2.0f;
-    public float cameraMaxPosX { get; set; } = 2.0f;
+    public float cameraMinPosx { get; set; } = -1.85f;
+    public float cameraMaxPosX { get; set; } = 1.85f;
 
     // background
     public float bgTreeSpeed { get; set; } = 0.25f;
     public float bgForrestSpeed { get; set; } = 0.5f;
-    public float bgSkySpeed { get; set; } = 1.0f;
+    public float bgSkySpeed { get; set; } = 0.9f;
 
 
 }
