@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public bool _isClearHard;
 
     public ConfigManager _cfgMgr;
+    public SoundManager _sndMgr;
     GameObject _canvas;
     GameObject _baseGroup;
     GameObject _backGroup;
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         _cfgMgr = FindObjectOfType<ConfigManager>();
+        _sndMgr = FindObjectOfType<SoundManager>();
         _camera = GameObject.FindGameObjectWithTag("MainCamera");
 
         InitGameUIObject();
@@ -67,6 +69,8 @@ public class GameManager : MonoBehaviour
 
             setActiveBase(false);
             SetActiveClearImage();
+
+            _sndMgr.Play("BGM");
         }
     }
 

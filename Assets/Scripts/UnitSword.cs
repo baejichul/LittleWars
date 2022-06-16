@@ -8,7 +8,7 @@ public class UnitSword : Unit
 {
     protected override void InitUnitConfig()
     {
-        // 종족설정
+        // 유닛클래스설정
         _unitConfig._unitClass = UNIT_CLASS.SWORD;
 
         // 기본값 설정
@@ -19,20 +19,13 @@ public class UnitSword : Unit
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
+    }
 
-        // 팀 및 이동속도설정
-        if (gameObject.layer == (int)TEAM.BLUE)
-        {
-            _unitConfig._team = TEAM.BLUE;
-            _unitConfig._enemyObj = GameObject.FindGameObjectsWithTag(TEAM.RED.ToString());
-        }
-
-        if (gameObject.layer == (int)TEAM.RED)
-        {
-            _unitConfig._team = TEAM.RED;
-            _unitConfig._enemyObj = GameObject.FindGameObjectsWithTag(TEAM.BLUE.ToString());
-            _unitConfig._speed = _unitConfig._speed * -1.0f;
-        }
+    protected override void InitWeaponConfig()
+    {
+        _weaponConfig._speed = 0.0f;
+        _weaponConfig._weapon = WEAPON.SWORD;
+        _weaponConfig._damage = 0;
     }
 
 }
