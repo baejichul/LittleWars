@@ -56,9 +56,10 @@ public class SoundManager : MonoBehaviour
             transform.Find(gameObject).GetComponent<AudioSource>().Play();
     }
 
-    public void Play(UNIT_CLASS unitClass)
+    public void PlayAttack(UNIT_CLASS unitClass)
     {
-        transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().Play();
+        _attackAudioDictionary[unitClass.ToString()].Play();
+        // transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().Play();
     }
 
     // 오디오 stop
@@ -68,9 +69,10 @@ public class SoundManager : MonoBehaviour
             transform.Find(gameObject).GetComponent<AudioSource>().Stop();
     }
 
-    public void Stop(UNIT_CLASS unitClass)
+    public void StopAttack(UNIT_CLASS unitClass)
     {
-        transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().Stop();
+        _attackAudioDictionary[unitClass.ToString()].Stop();
+        // transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().Stop();
     }
 
     // 오디오 pause
@@ -80,9 +82,10 @@ public class SoundManager : MonoBehaviour
             transform.Find(gameObject).GetComponent<AudioSource>().Pause();
     }
 
-    public void Pause(UNIT_CLASS unitClass)
+    public void PauseAttack(UNIT_CLASS unitClass)
     {
-        transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().Pause();
+        _attackAudioDictionary[unitClass.ToString()].Pause();
+        // transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().Pause();
     }
 
     // 오디오 unpause
@@ -92,8 +95,9 @@ public class SoundManager : MonoBehaviour
             transform.Find(gameObject).GetComponent<AudioSource>().UnPause();
     }
 
-    public void UnPause(UNIT_CLASS unitClass)
+    public void UnPauseAttack(UNIT_CLASS unitClass)
     {
-        transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().UnPause();
+        _attackAudioDictionary[unitClass.ToString()].UnPause();
+        // transform.Find(_cfgMgr.audSrcAttack).gameObject.transform.Find(unitClass.ToString()).gameObject.GetComponent<AudioSource>().UnPause();
     }
 }

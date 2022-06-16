@@ -14,7 +14,7 @@ public class UnitSword : Unit
         // 기본값 설정
         _unitConfig._speed = 1.0f;
         _unitConfig._attackRange = 0.7f; // 0.4f 2.5f 3.5f
-        _unitConfig._maxHp = 1000;
+        _unitConfig._maxHp = 100000;
         _unitConfig._power = 3;
 
         // 에너지 설정

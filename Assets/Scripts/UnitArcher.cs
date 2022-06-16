@@ -14,7 +14,7 @@ public class UnitArcher : Unit
         // 기본값 설정
         _unitConfig._speed = 0.4f;
         _unitConfig._attackRange = 5.0f; // 0.4f 2.5f 3.5f
-        _unitConfig._maxHp = 800;
+        _unitConfig._maxHp = 50000;
         _unitConfig._power = 0;
 
         // 에너지 설정
@@ -25,7 +25,7 @@ public class UnitArcher : Unit
     {
         _weaponConfig._speed = 5.0f;
         _weaponConfig._weapon = WEAPON.ARROW;
-        _weaponConfig._damage = 100;
+        _weaponConfig._damage = 5000;
         _weaponConfig._defaultWeaponPos = transform.Find("ArrowDefaultPos").position;
     }
 

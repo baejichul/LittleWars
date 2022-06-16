@@ -64,7 +64,7 @@ public class Unit : MonoBehaviour
         _unitConfig._speed = 1.0f;
 
         _unitConfig._attackRange = 0.7f; // 0.4f 2.5f 3.5f
-        _unitConfig._maxHp = 1000;
+        _unitConfig._maxHp = 100000;
         _unitConfig._power = 1;
 
         // 에너지 설정
@@ -230,8 +230,10 @@ public class Unit : MonoBehaviour
         // UnitConfig enemyUC = enemyObj.GetComponent<UnitConfig>();
         enemyUnit._unitConfig._hp = enemyUnit._unitConfig._hp - damage;
         enemyUnit._unitConfig._hp = Math.Max(enemyUnit._unitConfig._hp, 0);
+        // Debug.Log(gameObject.name + " => damage = " + damage + " : _hp = " + enemyUnit._unitConfig._hp);
+
         _ani.SetTrigger("LWHit");
-        _sndMgr.Play(_unitConfig._unitClass);
+        // _sndMgr.PlayAttack(_unitConfig._unitClass);
 
         if (enemyUnit._unitConfig._hp == 0)
             DoDie(enemyUnit, enemyObj);
