@@ -249,4 +249,19 @@ public class GameManager : MonoBehaviour
                 
         }
     }
+
+    public void BuyUnit(string gameObjNm)
+    {
+        GameObject gUnitObj  = GameObject.FindGameObjectWithTag("Unit");
+        // GameObject sourceObj = Resources.Load<GameObject>(_cfgMgr.defaultPrefabUnitPath + gameObjNm);
+        GameObject sourceObj = Resources.Load(_cfgMgr.defaultPrefabUnitPath + gameObjNm) as GameObject;
+
+        GameObject targetObj = Instantiate(sourceObj, gUnitObj.transform);
+        targetObj.name = gameObjNm;
+    }
+
+    public void UpgradeUnit(string gameObjNm)
+    {
+        
+    }
 }

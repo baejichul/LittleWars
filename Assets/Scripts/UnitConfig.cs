@@ -11,9 +11,12 @@ public class UnitConfig
     public int _hp = 0;
     public int _maxHp = 100000;
     public int _power = 1;
-    public GameObject[] _enemyObj = null;
+    public int _level = 1;
+    public List<GameObject> _enemyObjList = null;
 
     public TEAM _team = TEAM.BLUE;
     public UNIT_CLASS _unitClass = UNIT_CLASS.SWORD;
     public WEAPON _weapon = WEAPON.SWORD;
+
+    public Vector3 _hpBarOffset = new Vector3(-0.25f, 1.1f, 0);
 }

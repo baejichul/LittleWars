@@ -11,16 +11,19 @@ public class EventListener : MonoBehaviour
     GameObject _introUI;
     GameObject _playUI;
     GameObject _endUI;
+    Transform _controlSet;
 
     void Start()
     {
         _gameMgr = FindObjectOfType<GameManager>();
         _introUI = _gameMgr.GetGameUIObject("IntroUI");
-        _playUI = _gameMgr.GetGameUIObject("PlayUI");
-        _endUI = _gameMgr.GetGameUIObject("EndUI");
+        _playUI  = _gameMgr.GetGameUIObject("PlayUI");
+        _endUI   = _gameMgr.GetGameUIObject("EndUI");
+        _controlSet = _playUI.transform.Find("ControlSet");
 
         SetDifficulty();
         SetCameraScroll();
+        SetUnit();
     }
 
     void SetDifficulty()
@@ -49,7 +52,7 @@ public class EventListener : MonoBehaviour
 
     void SetCameraScroll()
     {
-        GameObject gObjBtnRight = _playUI.transform.Find("ControlSet").Find("BtnRight").gameObject;
+        GameObject gObjBtnRight = _controlSet.Find("BtnRight").gameObject;
         if (gObjBtnRight is not null)
         {
             EventTrigger.Entry entryDown = new EventTrigger.Entry();
@@ -66,7 +69,7 @@ public class EventListener : MonoBehaviour
             et.triggers.Add(entryUp);
         }
 
-        GameObject gObjBtnLeft = _playUI.transform.Find("ControlSet").Find("BtnLeft").gameObject;
+        GameObject gObjBtnLeft = _controlSet.Find("BtnLeft").gameObject;
         if (gObjBtnLeft is not null)
         {
             EventTrigger.Entry entryDown = new EventTrigger.Entry();
@@ -83,7 +86,24 @@ public class EventListener : MonoBehaviour
         }
     }
 
-    
+    void SetUnit()
+    {
+        Button[] btnBlueTeam = _controlSet.Find("BlueTeam").GetComponentsInChildren<Button>();
+        foreach(Button btn in btnBlueTeam)
+        {
+            string objNm = "B" + btn.name.Substring(4);
+            btn.onClick.AddListener(() => _gameMgr.BuyUnit(objNm));
+            btn.onClick.AddListener(() => _gameMgr.UpgradeUnit(objNm));
+        }
+
+        Button[] btnRedTeam  = _controlSet.Find("RedTeam").GetComponentsInChildren<Button>();
+        foreach (Button btn in btnRedTeam)
+        {
+            string objNm = "R" + btn.name.Substring(4);
+            btn.onClick.AddListener(() => _gameMgr.BuyUnit(objNm));
+            btn.onClick.AddListener(() => _gameMgr.UpgradeUnit(objNm));
+        }
+    }
 
     
 

@@ -72,5 +72,8 @@ public class ConfigManager : MonoBehaviour
     public string audSrcVictory { get; set; } = "Victory";
     public string audSrcAttack { get; set; } = "Attack";
 
+    //Resource PAth 
+    public string defaultPrefabUnitPath = "Prefabs/UNIT/";
+
 
 }

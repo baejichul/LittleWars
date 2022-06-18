@@ -6,27 +6,26 @@ using UnityEngine.EventSystems;
 
 public class UnitArcher : Unit
 {
-    protected override void InitUnitConfig()
+    protected override void InitUnitConfig(int level)
     {
         // 유닛클래스설정
         _unitConfig._unitClass = UNIT_CLASS.ARCHER;
 
         // 기본값 설정
-        _unitConfig._speed = 0.4f;
-        _unitConfig._attackRange = 5.0f; // 0.4f 2.5f 3.5f
-        _unitConfig._maxHp = 50000;
-        _unitConfig._power = 0;
+        _unitConfig._speed = 0.4f * level;
+        _unitConfig._attackRange = 5.0f * level; // 0.4f 2.5f 3.5f
+        _unitConfig._maxHp = 50000 * level;
+        _unitConfig._power = 0 * level;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
     }
 
-    protected override void InitWeaponConfig()
+    protected override void InitWeaponConfig(int level)
     {
-        _weaponConfig._speed = 5.0f;
+        _weaponConfig._speed = 5.0f * level;
         _weaponConfig._weapon = WEAPON.ARROW;
-        _weaponConfig._damage = 5000;
-        _weaponConfig._defaultWeaponPos = transform.Find("ArrowDefaultPos").position;
+        _weaponConfig._damage = 5000 * level;
     }
 
     // 공격

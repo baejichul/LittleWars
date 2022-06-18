@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Unit : MonoBehaviour
 {
     protected float _tmpSpeed;
-    protected bool _isAttacking = false;
+    public bool _isAttacking = false;
 
     protected GameManager _gMgr;
     public SoundManager _sndMgr;
@@ -17,6 +18,8 @@ public class Unit : MonoBehaviour
     protected GameObject _dust;
     protected Animator _ani;
     protected ParticleSystem _ps;
+    GameObject _hpBarObj;
+    public GameObject _targetHpBar;
 
     // Start is called before the first frame update
     void Start()
@@ -42,7 +45,9 @@ public class Unit : MonoBehaviour
         InitWeaponConfig();
         InitTeam();
         InitEnemyList();
+        InitHpBar();
         initRedTeam();
+        
 
         // 파티클 설정
         if (transform.Find("Dust") != null)
@@ -55,27 +60,42 @@ public class Unit : MonoBehaviour
         _ani = GetComponent<Animator>();
     }
 
-    protected virtual void InitUnitConfig()
+    protected void InitUnitConfig()
+    {
+        // 업그레이드 유닛설정
+        String gObjNm = transform.parent.gameObject.name;
+        if (gObjNm.EndsWith("U"))
+            _unitConfig._level = _unitConfig._level + 1;
+
+        InitUnitConfig(_unitConfig._level);
+    }
+
+    protected virtual void InitUnitConfig(int level)
     {
         // 유닛클래스설정
         _unitConfig._unitClass = UNIT_CLASS.SWORD;
 
         // 기본값 설정
-        _unitConfig._speed = 1.0f;
+        _unitConfig._speed = 1.0f * level;
 
-        _unitConfig._attackRange = 0.7f; // 0.4f 2.5f 3.5f
-        _unitConfig._maxHp = 100000;
-        _unitConfig._power = 1;
+        _unitConfig._attackRange = 0.7f * level; // 0.4f 2.5f 3.5f
+        _unitConfig._maxHp = 100000 * level;
+        _unitConfig._power = 1 * level;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
     }
 
-    protected virtual void InitWeaponConfig()
+    protected void InitWeaponConfig()
     {
-        _weaponConfig._speed = 0;
+        InitWeaponConfig(_unitConfig._level);
+    }
+
+    protected virtual void InitWeaponConfig(int level)
+    {
+        _weaponConfig._speed = 0 * level;
         _weaponConfig._weapon = WEAPON.SWORD;
-        _weaponConfig._damage = 0;
+        _weaponConfig._damage = 0 * level;
     }
 
     void InitTeam()
@@ -89,11 +109,35 @@ public class Unit : MonoBehaviour
 
     void InitEnemyList()
     {
+        _unitConfig._enemyObjList = new List<GameObject>();
+
         if (gameObject.layer == (int)TEAM.BLUE)
-            _unitConfig._enemyObj = GameObject.FindGameObjectsWithTag(TEAM.RED.ToString());
+        {
+            GameObject[] enemyArr = GameObject.FindGameObjectsWithTag(TEAM.RED.ToString());
+            if (enemyArr != null)
+            {
+                // 나의 적리스트를 추가한 후 적의 적리스트에 나를 추가한다.
+                _unitConfig._enemyObjList.AddRange(enemyArr);
+                foreach ( GameObject gObj in enemyArr)
+                {
+                    gObj.GetComponent<Unit>()._unitConfig._enemyObjList.Add(gameObject);
+                }
+            }
+        }
 
         if (gameObject.layer == (int)TEAM.RED)
-            _unitConfig._enemyObj = GameObject.FindGameObjectsWithTag(TEAM.BLUE.ToString());
+        {
+            GameObject[] enemyArr = GameObject.FindGameObjectsWithTag(TEAM.BLUE.ToString());
+            if (enemyArr != null)
+            {
+                // 나의 적리스트를 추가한 후 적의 적리스트에 나를 추가한다.
+                _unitConfig._enemyObjList.AddRange(enemyArr);
+                foreach (GameObject gObj in enemyArr)
+                {
+                    gObj.GetComponent<Unit>()._unitConfig._enemyObjList.Add(gameObject);
+                }
+            }   
+        }
     }
 
     void initRedTeam()
@@ -102,21 +146,42 @@ public class Unit : MonoBehaviour
         {
             _unitConfig._speed = _unitConfig._speed * -1.0f;
             _weaponConfig._speed = _weaponConfig._speed * -1.0f;
+            _unitConfig._hpBarOffset.x = _unitConfig._hpBarOffset.x * -1.0f;
         }
             
     }
 
+    void InitHpBar()
+    {
+        if (gameObject.layer == (int)TEAM.BLUE)
+            _hpBarObj = _gMgr._playUI.transform.Find("HpBarBlue").gameObject;
+        if (gameObject.layer == (int)TEAM.RED)
+            _hpBarObj = _gMgr._playUI.transform.Find("HpBarRed").gameObject;
+
+        _targetHpBar = Instantiate(_hpBarObj,_gMgr._playUI.transform);
+        _targetHpBar.name = _hpBarObj.name;
+        UpdateHpBarPos(_targetHpBar);
+    }
+
+    
     // 유닛 이동
     void DoMove()
     {
         if (_gMgr._uiMode == UIMODE.PLAY)
         {
-            if (_unitConfig._enemyObj != null && _unitConfig._enemyObj.Length > 0)
+            if (_targetHpBar is not null)
+                UpdateHpBarPos(_targetHpBar);
+            
+
+            // 항목삭제 후에도 _unitConfig._enemyObjList.Count 1이 되는 문제 발생
+            if (_unitConfig._enemyObjList.Count > 0)
             {
                 GameObject enemy = FindEnemy();
-                if (enemy != null) DoAttack(enemy);
+                if (enemy != null)
+                    DoAttack(enemy);
             }
-
+            
+            
             if (_isAttacking == false)
             {
                 gameObject.transform.Translate(_unitConfig._speed * Time.deltaTime, 0.0f, 0.0f);
@@ -177,8 +242,8 @@ public class Unit : MonoBehaviour
 
         Vector3 myObj = gameObject.transform.position;      
         float myPosX = myObj.x;
-        
-        foreach (GameObject obj in _unitConfig._enemyObj)
+
+        foreach (GameObject obj in _unitConfig._enemyObjList)
         {
             if (obj != null)
             {
@@ -232,29 +297,65 @@ public class Unit : MonoBehaviour
         enemyUnit._unitConfig._hp = Math.Max(enemyUnit._unitConfig._hp, 0);
         // Debug.Log(gameObject.name + " => damage = " + damage + " : _hp = " + enemyUnit._unitConfig._hp);
 
-        _ani.SetTrigger("LWHit");
-        // _sndMgr.PlayAttack(_unitConfig._unitClass);
-
         if (enemyUnit._unitConfig._hp == 0)
+        {
+            _isAttacking = false;
             DoDie(enemyUnit, enemyObj);
-            
+        }
+        else
+        {
+            UpdateHpBar(enemyUnit._targetHpBar, enemyUnit._unitConfig);
+
+            enemyUnit._ani.SetTrigger("LWHit");
+            // _sndMgr.PlayAttack(_unitConfig._unitClass);
+        }
+
+
     }
 
     // 사망
     void DoDie(Unit enemyUnit, GameObject enemyObj)
     {
         enemyUnit._ani.SetBool("LWDie", true);
-        _isAttacking = false;
-
-        List<GameObject> list = new List<GameObject>(_unitConfig._enemyObj);
-        list.Remove(enemyObj);
-        _unitConfig._enemyObj = list.ToArray();
+        RemoveEnemy(enemyObj);
         _sndMgr.Play("Deafeat");
 
 
         // enemyObj.GetComponent<BoxCollider2D>().enabled = false;
         // enemyObj.GetComponent<SpriteRenderer>().sortingOrder = 1;
+        Destroy(enemyUnit._targetHpBar);
         Destroy(enemyObj,1.0f);
+    }
+
+    public void AddEnemy(GameObject enemyObj)
+    {   
+        _unitConfig._enemyObjList.Add(enemyObj);
+    }
+
+    void RemoveEnemy(GameObject enemyObj)
+    {   
+        _unitConfig._enemyObjList.Remove(enemyObj);
+    }
+
+    void UpdateHpBar(GameObject hpBarObj, UnitConfig unitConfig)
+    {
+        if (hpBarObj.transform.Find("Hp") is not null)
+        {
+            hpBarObj.transform.Find("Hp").gameObject.GetComponent<Image>().fillAmount = (float)unitConfig._hp / (float)unitConfig._maxHp;
+            // Debug.LogFormat("hpBarObj {0} : fillAmount {1}", hpBarObj.name, hpBarObj.transform.Find("Hp").gameObject.GetComponent<Image>().fillAmount);
+        }
+            
+    }
+
+    void UpdateHpBarPos(GameObject hpBarObj)
+    {
+        //Debug.Log(hpBarObj.name);
+        Vector3 unitPos = transform.position;       
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(unitPos + _unitConfig._hpBarOffset);     // 월드좌표를 스크린좌표(UI 좌표)로 변환
+
+        // 변환된 스크린좌표를 체력바의 rectTransform에 적용
+        if (hpBarObj != null)
+            hpBarObj.transform.position = screenPos;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

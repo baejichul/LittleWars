@@ -35,7 +35,7 @@ public class Weapon : MonoBehaviour
 
                 // 화살 복제
                 GameObject gObj = Instantiate(gameObject, transform.parent);
-                gObj.transform.position = _myUnit._weaponConfig._defaultWeaponPos;
+                gObj.transform.position = transform.parent.transform.Find("ArrowDefaultPos").transform.position;
                 gObj.name = "Arrow";
                 gObj.SetActive(false);
 
