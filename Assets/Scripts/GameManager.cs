@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public GameObject _endUI;
 
     public GameObject _camera;
+    GameObject _targetObj;
 
     public UIMODE _uiMode;
     public DIFFICULTY _difficulty;
@@ -48,7 +49,7 @@ public class GameManager : MonoBehaviour
     {   
         MoveTitleSet();
         MoveCamera();
-        SetCostBar();
+        SetBlueMenu();
     }
 
     private void LateUpdate()
@@ -151,6 +152,65 @@ public class GameManager : MonoBehaviour
         Invoke("IncreaseCostNow", 2.0f);
     }
 
+    void SetBlueMenu()
+    {
+        SetUpgradeBtn();
+        SetCostBar();
+    }
+
+    void SetUpgradeBtn()
+    {
+        GameObject btObj = _playUI.transform.Find("ControlSet").transform.Find("BlueTeam").gameObject;
+        if (btObj is not null)
+        {
+            if (_cost >= _cfgMgr._cost[UNIT_CLASS.ARCHER] * _cfgMgr._upgradeCost)
+            {
+                btObj.transform.Find("BtnBAU").GetComponent<Image>().enabled = true;
+                btObj.transform.Find("BtnBAU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+            }
+            else
+            {
+                btObj.transform.Find("BtnBAU").GetComponent<Image>().enabled = false;
+                btObj.transform.Find("BtnBAU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+            }
+
+            if (_cost >= _cfgMgr._cost[UNIT_CLASS.GUARD] * _cfgMgr._upgradeCost)
+            {
+                btObj.transform.Find("BtnBGU").GetComponent<Image>().enabled = true;
+                btObj.transform.Find("BtnBGU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+            }
+            else
+            {
+                btObj.transform.Find("BtnBGU").GetComponent<Image>().enabled = false;
+                btObj.transform.Find("BtnBGU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+            }
+
+            if (_cost >= _cfgMgr._cost[UNIT_CLASS.SWORD] * _cfgMgr._upgradeCost)
+            {
+                btObj.transform.Find("BtnBSU").GetComponent<Image>().enabled = true;
+                btObj.transform.Find("BtnBSU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+            }
+            else
+            {
+                btObj.transform.Find("BtnBSU").GetComponent<Image>().enabled = false;
+                btObj.transform.Find("BtnBSU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+            }
+
+            if (_cost >= _cfgMgr._cost[UNIT_CLASS.WIZARD] * _cfgMgr._upgradeCost)
+            {
+                btObj.transform.Find("BtnBWU").GetComponent<Image>().enabled = true;
+                btObj.transform.Find("BtnBWU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+            }
+            else
+            {
+                btObj.transform.Find("BtnBWU").GetComponent<Image>().enabled = false;
+                btObj.transform.Find("BtnBWU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+            }
+        }
+        
+    }
+       
+
     void SetCostBar()
     {
         if (_uiMode == UIMODE.PLAY)
@@ -164,6 +224,43 @@ public class GameManager : MonoBehaviour
                 imgCost.Find("TxtShadow").GetComponent<Text>().text = _cost.ToString("D2");
                 imgCost.Find("TxtCost").GetComponent<Text>().text = _cost.ToString("D2");
             }
+        }
+    }
+
+    void SetPortrait(string gameObjNm, UNIT_CLASS uc)
+    {
+        // 이미지 설정
+        string resourceNm = "Portrait " + gameObjNm.Substring(1);
+        Sprite sp = Resources.Load<Sprite>(_cfgMgr.defaultSpritesUIPath + resourceNm);
+
+        // HP, POWER, COST 설정
+        Unit ut = _targetObj.GetComponent<Unit>();
+        int level = ut._unitConfig._level;
+        int unitCs = _cfgMgr._cost[uc];
+        if (gameObjNm.EndsWith("U"))
+        {
+            gameObjNm = gameObjNm.Substring(0, 2);
+            unitCs = unitCs * _cfgMgr._upgradeCost;
+            level = level + 1;
+        }
+        
+        ut.InitUnitConfig(level);
+        int unitHp = ut._unitConfig._hp;
+        int unitPw = ut._unitConfig._power;
+        int unitLv = ut._unitConfig._level;
+
+        if (gameObjNm.EndsWith("U"))
+            gameObjNm = gameObjNm.Substring(0, 2);
+
+        GameObject gObj = _playUI.transform.Find("ControlSet").transform.Find("BlueTeam").transform.Find("Btn" + gameObjNm).gameObject;
+        if (gObj is not null)
+        {
+            if (sp is not null)
+                gObj.transform.Find("Image").GetComponent<Image>().sprite = sp;
+
+            gObj.transform.Find("HP").transform.Find("Text").GetComponent<Text>().text = string.Format("{0}K", (double)unitHp / 1000);
+            gObj.transform.Find("Attack").transform.Find("Text").GetComponent<Text>().text = unitPw.ToString();
+            gObj.transform.Find("Cost").transform.Find("Text").GetComponent<Text>().text = unitCs.ToString();
         }
     }
 
@@ -326,19 +423,27 @@ public class GameManager : MonoBehaviour
         // GameObject sourceObj = Resources.Load<GameObject>(_cfgMgr.defaultPrefabUnitPath + gameObjNm);
         GameObject sourceObj = Resources.Load(_cfgMgr.defaultPrefabUnitPath + gameObjNm) as GameObject;
 
-        GameObject targetObj = Instantiate(sourceObj, gUnitObj.transform);
-        targetObj.name = gameObjNm;
-        targetObj.SetActive(false);
+        _targetObj = Instantiate(sourceObj, gUnitObj.transform);
+        _targetObj.name = gameObjNm;
+        _targetObj.SetActive(false);
 
-        if (_cost >= _cfgMgr._cost[uc])
+        if (gameObjNm.Substring(0, 1).Equals("B"))
         {
-            _cost = _cost - _cfgMgr._cost[uc];
-            targetObj.SetActive(true);
-            _sndMgr.Play("Buy");
-        }   
+            if (_cost >= _cfgMgr._cost[uc])
+            {
+                _cost = _cost - _cfgMgr._cost[uc];
+                _targetObj.SetActive(true);
+                SetPortrait(gameObjNm, uc);
+                _sndMgr.Play("Buy");
+            }
+            else
+                Destroy(_targetObj);
+        }
         else
-            Destroy(targetObj);
-
+        {
+            _targetObj.SetActive(true);
+            _sndMgr.Play("Buy");
+        }
     }
 
     // 유닛 업그레이드
@@ -347,17 +452,26 @@ public class GameManager : MonoBehaviour
         GameObject gUnitObj = GameObject.FindGameObjectWithTag("Unit");
         GameObject sourceObj = Resources.Load(_cfgMgr.defaultPrefabUnitPath + gameObjNm) as GameObject;
 
-        GameObject targetObj = Instantiate(sourceObj, gUnitObj.transform);
-        targetObj.name = gameObjNm;
-        targetObj.SetActive(false);
-        
-        if (_cost >= _cfgMgr._cost[uc] * _cfgMgr._upgradeCost)
+        _targetObj = Instantiate(sourceObj, gUnitObj.transform);
+        _targetObj.name = gameObjNm;
+        _targetObj.SetActive(false);
+
+        if (gameObjNm.Substring(0, 1).Equals("B"))
         {
-            _cost = _cost - _cfgMgr._cost[uc] * _cfgMgr._upgradeCost;
-            targetObj.SetActive(true);
-            _sndMgr.Play("Upgrade");
-        }   
+            if (_cost >= _cfgMgr._cost[uc] * _cfgMgr._upgradeCost)
+            {
+                _cost = _cost - _cfgMgr._cost[uc] * _cfgMgr._upgradeCost;
+                _targetObj.SetActive(true);
+                SetPortrait(gameObjNm, uc);
+                _sndMgr.Play("Upgrade");
+            }
+            else
+                Destroy(_targetObj);
+        }
         else
-            Destroy(targetObj);
+        {
+            _targetObj.SetActive(true);
+            _sndMgr.Play("Buy");
+        }
     }
 }

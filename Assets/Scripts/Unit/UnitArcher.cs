@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class UnitArcher : Unit
 {
-    protected override void InitUnitConfig(int level)
+    public override void InitUnitConfig(int level)
     {
         // 유닛클래스설정
         _unitConfig._unitClass = UNIT_CLASS.ARCHER;
@@ -16,12 +16,13 @@ public class UnitArcher : Unit
         _unitConfig._attackRange = 5.0f + (level - 1) * 0.2f;
         _unitConfig._maxHp = 50000 + (level - 1) * 1000;
         _unitConfig._power = 0;
+        _unitConfig._level = level;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
     }
 
-    protected override void InitWeaponConfig(int level)
+    public override void InitWeaponConfig(int level)
     {
         _weaponConfig._speed = 5.0f + (level - 1) * 0.1f;
         _weaponConfig._weapon = WEAPON.ARROW;

@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class UnitGuard : Unit
 {
-    protected override void InitUnitConfig(int level)
+    public override void InitUnitConfig(int level)
     {
         // 유닛클래스설정
         _unitConfig._unitClass = UNIT_CLASS.GUARD;
@@ -16,12 +16,13 @@ public class UnitGuard : Unit
         _unitConfig._attackRange = 0.4f + (level - 1) * 0.2f;
         _unitConfig._maxHp = 200000 + (level - 1) * 10000;
         _unitConfig._power = 1 + (level - 1) * 1;
+        _unitConfig._level = level;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
     }
 
-    protected override void InitWeaponConfig(int level)
+    public override void InitWeaponConfig(int level)
     {
         _weaponConfig._speed = 0.0f;
         _weaponConfig._weapon = WEAPON.SHIELD;

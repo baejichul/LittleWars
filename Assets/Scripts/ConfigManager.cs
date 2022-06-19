@@ -74,6 +74,7 @@ public class ConfigManager : MonoBehaviour
 
     //Resource Path 
     public string defaultPrefabUnitPath = "Prefabs/UNIT/";
+    public string defaultSpritesUIPath  = "Sprites/UI/";
 
     // Unit
     public IDictionary<UNIT_CLASS, int> _cost = new Dictionary<UNIT_CLASS, int>();

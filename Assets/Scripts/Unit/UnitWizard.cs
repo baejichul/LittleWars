@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class UnitWizard : Unit
 {
-    protected override void InitUnitConfig(int level)
+    public override void InitUnitConfig(int level)
     {
         // 유닛클래스설정
         _unitConfig._unitClass = UNIT_CLASS.WIZARD;
@@ -16,12 +16,13 @@ public class UnitWizard : Unit
         _unitConfig._attackRange = 6.0f + (level - 1) * 0.3f;
         _unitConfig._maxHp = 40000 + (level - 1) * 1000;
         _unitConfig._power = 6 + (level - 1) * 1;
+        _unitConfig._level = level;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
     }
 
-    protected override void InitWeaponConfig(int level)
+    public override void InitWeaponConfig(int level)
     {
         _weaponConfig._speed = 0.0f;
         _weaponConfig._weapon = WEAPON.MAGIC;

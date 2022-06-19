@@ -70,7 +70,7 @@ public class Unit : MonoBehaviour
         InitUnitConfig(_unitConfig._level);
     }
 
-    protected virtual void InitUnitConfig(int level)
+    public virtual void InitUnitConfig(int level)
     {
         // 유닛클래스설정
         _unitConfig._unitClass = UNIT_CLASS.SWORD;
@@ -81,6 +81,7 @@ public class Unit : MonoBehaviour
         _unitConfig._attackRange = 0.7f * level; // 0.4f 2.5f 3.5f
         _unitConfig._maxHp = 100000 * level;
         _unitConfig._power = 1 * level;
+        _unitConfig._level = level;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
@@ -91,7 +92,7 @@ public class Unit : MonoBehaviour
         InitWeaponConfig(_unitConfig._level);
     }
 
-    protected virtual void InitWeaponConfig(int level)
+    public virtual void InitWeaponConfig(int level)
     {
         _weaponConfig._speed = 0 * level;
         _weaponConfig._weapon = WEAPON.SWORD;
