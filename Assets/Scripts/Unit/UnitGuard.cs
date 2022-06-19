@@ -12,10 +12,10 @@ public class UnitGuard : Unit
         _unitConfig._unitClass = UNIT_CLASS.GUARD;
 
         // 기본값 설정
-        _unitConfig._speed = 1.0f * level;
-        _unitConfig._attackRange = 0.4f * level; // 0.4f 2.5f 3.5f
-        _unitConfig._maxHp = 200000 * level;
-        _unitConfig._power = 1 * level;
+        _unitConfig._speed = 1.0f + (level - 1) * 0.1f;
+        _unitConfig._attackRange = 0.4f + (level - 1) * 0.2f;
+        _unitConfig._maxHp = 200000 + (level - 1) * 10000;
+        _unitConfig._power = 1 + (level - 1) * 1;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
@@ -23,8 +23,8 @@ public class UnitGuard : Unit
 
     protected override void InitWeaponConfig(int level)
     {
-        _weaponConfig._speed = 0.0f * level;
+        _weaponConfig._speed = 0.0f;
         _weaponConfig._weapon = WEAPON.SHIELD;
-        _weaponConfig._damage = 0 * level;
+        _weaponConfig._damage = 0;
     }
 }

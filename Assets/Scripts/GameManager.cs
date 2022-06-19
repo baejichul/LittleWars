@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,10 +23,14 @@ public class GameManager : MonoBehaviour
 
     public UIMODE _uiMode;
     public DIFFICULTY _difficulty;
+    Transform imgCost;
 
     float _titleSetVal = 0.0f;
     int _cameraPosX = 0;
     bool _isCarmeraMove = true;
+    public int _cost = 0;
+    int _maxCost = 10;
+    float _maxBarwidth;
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +48,7 @@ public class GameManager : MonoBehaviour
     {   
         MoveTitleSet();
         MoveCamera();
+        SetCostBar();
     }
 
     private void LateUpdate()
@@ -71,6 +77,12 @@ public class GameManager : MonoBehaviour
             SetActiveClearImage();
 
             _sndMgr.Play("BGM");
+
+            // 유닛 구매 가격설정
+            _cfgMgr._cost[UNIT_CLASS.SWORD] = 3;
+            _cfgMgr._cost[UNIT_CLASS.GUARD] = 3;
+            _cfgMgr._cost[UNIT_CLASS.WIZARD] = 4;
+            _cfgMgr._cost[UNIT_CLASS.ARCHER] = 5;
         }
     }
 
@@ -100,6 +112,58 @@ public class GameManager : MonoBehaviour
             _endUI.SetActive(false);
 
             setActiveBase(true);
+            // StartCoroutine("IncreaseCost");
+            // StartCoroutine(IncreaseCost());
+            Invoke("IncreaseCostNow", 2.0f);
+
+            imgCost = _playUI.transform.Find("ControlSet").transform.Find("ImgCost");
+            if (imgCost is not null)
+            {
+                Vector2 vec = imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta;
+                _maxBarwidth = vec.x;               // 최대값 저장
+
+                imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, vec.y);      // 0으로 초기화
+            }
+            
+        }
+    }
+
+    // 2초 간격으로 Cost 증가
+    IEnumerator IncreaseCost()
+    {   
+        while (_cost < _maxCost)
+        {
+            yield return new WaitForSeconds(2.0f);
+            _cost = _cost + 1;
+            SetCostBar();
+        }
+    }
+
+    // 2초 간격으로 Cost 증가
+    void IncreaseCostNow()
+    {
+        if (_cost < _maxCost)
+        {
+            _cost = _cost + 1;
+            // SetCostBar();
+        }
+
+        Invoke("IncreaseCostNow", 2.0f);
+    }
+
+    void SetCostBar()
+    {
+        if (_uiMode == UIMODE.PLAY)
+        {
+            float bar = _maxBarwidth * (float)_cost / (float)_maxCost;
+            Vector2 vec = imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta;
+
+            if (imgCost is not null)
+            {
+                imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta = new Vector2(bar, vec.y);
+                imgCost.Find("TxtShadow").GetComponent<Text>().text = _cost.ToString("D2");
+                imgCost.Find("TxtCost").GetComponent<Text>().text = _cost.ToString("D2");
+            }
         }
     }
 
@@ -147,6 +211,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 건물 활성화
     void setActiveBase(bool flag) 
     {
         _baseGroup = GameObject.FindGameObjectWithTag("BaseGroup");
@@ -175,6 +240,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // 카메라 위치 설정
     public void MoveCameraPosX(POINTER pt, DIRECTION dir)
     {
         if (_uiMode == UIMODE.PLAY)
@@ -201,6 +267,7 @@ public class GameManager : MonoBehaviour
 
     }
 
+    //카메라 위치 이동
     void MoveCamera()
     {
         if (_uiMode == UIMODE.PLAY)
@@ -230,6 +297,8 @@ public class GameManager : MonoBehaviour
         }   
     }
 
+
+    // 배경 위치 이동
     void MoveBackground()
     {
         _backGroup = GameObject.FindGameObjectWithTag("BackGroup");
@@ -250,7 +319,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void BuyUnit(string gameObjNm)
+    // 유닛 구매
+    public void BuyUnit(string gameObjNm, UNIT_CLASS uc)
     {
         GameObject gUnitObj  = GameObject.FindGameObjectWithTag("Unit");
         // GameObject sourceObj = Resources.Load<GameObject>(_cfgMgr.defaultPrefabUnitPath + gameObjNm);
@@ -258,10 +328,36 @@ public class GameManager : MonoBehaviour
 
         GameObject targetObj = Instantiate(sourceObj, gUnitObj.transform);
         targetObj.name = gameObjNm;
+        targetObj.SetActive(false);
+
+        if (_cost >= _cfgMgr._cost[uc])
+        {
+            _cost = _cost - _cfgMgr._cost[uc];
+            targetObj.SetActive(true);
+            _sndMgr.Play("Buy");
+        }   
+        else
+            Destroy(targetObj);
+
     }
 
-    public void UpgradeUnit(string gameObjNm)
+    // 유닛 업그레이드
+    public void UpgradeUnit(string gameObjNm, UNIT_CLASS uc)
     {
+        GameObject gUnitObj = GameObject.FindGameObjectWithTag("Unit");
+        GameObject sourceObj = Resources.Load(_cfgMgr.defaultPrefabUnitPath + gameObjNm) as GameObject;
+
+        GameObject targetObj = Instantiate(sourceObj, gUnitObj.transform);
+        targetObj.name = gameObjNm;
+        targetObj.SetActive(false);
         
+        if (_cost >= _cfgMgr._cost[uc] * _cfgMgr._upgradeCost)
+        {
+            _cost = _cost - _cfgMgr._cost[uc] * _cfgMgr._upgradeCost;
+            targetObj.SetActive(true);
+            _sndMgr.Play("Upgrade");
+        }   
+        else
+            Destroy(targetObj);
     }
 }

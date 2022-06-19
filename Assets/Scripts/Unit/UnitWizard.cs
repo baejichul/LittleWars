@@ -12,10 +12,10 @@ public class UnitWizard : Unit
         _unitConfig._unitClass = UNIT_CLASS.WIZARD;
 
         // 기본값 설정
-        _unitConfig._speed = 0.4f * level;
-        _unitConfig._attackRange = 6.0f * level; // 0.4f 2.5f 3.5f
-        _unitConfig._maxHp = 40000 * level;
-        _unitConfig._power = 6 * level;
+        _unitConfig._speed = 0.4f + (level - 1) * 0.1f;
+        _unitConfig._attackRange = 6.0f + (level - 1) * 0.3f;
+        _unitConfig._maxHp = 40000 + (level - 1) * 1000;
+        _unitConfig._power = 6 + (level - 1) * 1;
 
         // 에너지 설정
         _unitConfig._hp = _unitConfig._maxHp;
@@ -23,9 +23,9 @@ public class UnitWizard : Unit
 
     protected override void InitWeaponConfig(int level)
     {
-        _weaponConfig._speed = 0.0f * level;
+        _weaponConfig._speed = 0.0f;
         _weaponConfig._weapon = WEAPON.MAGIC;
-        _weaponConfig._damage = 0 * level;
+        _weaponConfig._damage = 0;
     }
 
     // 공격

@@ -285,6 +285,7 @@ public class Unit : MonoBehaviour
         else
         {
             _ani.SetBool("LWAttack", false);
+            _isAttacking = false;
         }
     }
 

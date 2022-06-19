@@ -92,16 +92,44 @@ public class EventListener : MonoBehaviour
         foreach(Button btn in btnBlueTeam)
         {
             string objNm = "B" + btn.name.Substring(4);
-            btn.onClick.AddListener(() => _gameMgr.BuyUnit(objNm));
-            btn.onClick.AddListener(() => _gameMgr.UpgradeUnit(objNm));
+            string classNm = btn.name.Substring(4,1);
+            UNIT_CLASS? uc = null;
+            if (classNm.Equals("A"))
+                uc = UNIT_CLASS.ARCHER;
+            else if (classNm.Equals("G"))
+                uc = UNIT_CLASS.GUARD;
+            else if (classNm.Equals("S"))
+                uc = UNIT_CLASS.SWORD;
+            else if (classNm.Equals("W"))
+                uc = UNIT_CLASS.WIZARD;
+
+            if (objNm.EndsWith("U"))
+                btn.onClick.AddListener(() => _gameMgr.UpgradeUnit(objNm, uc.Value));
+            else
+                btn.onClick.AddListener(() => _gameMgr.BuyUnit(objNm, uc.Value));
+
+
         }
 
         Button[] btnRedTeam  = _controlSet.Find("RedTeam").GetComponentsInChildren<Button>();
         foreach (Button btn in btnRedTeam)
         {
             string objNm = "R" + btn.name.Substring(4);
-            btn.onClick.AddListener(() => _gameMgr.BuyUnit(objNm));
-            btn.onClick.AddListener(() => _gameMgr.UpgradeUnit(objNm));
+            string classNm = btn.name.Substring(4, 1);
+            UNIT_CLASS? uc = null;
+            if (classNm.Equals("A"))
+                uc = UNIT_CLASS.ARCHER;
+            else if (classNm.Equals("G"))
+                uc = UNIT_CLASS.GUARD;
+            else if (classNm.Equals("S"))
+                uc = UNIT_CLASS.SWORD;
+            else if (classNm.Equals("W"))
+                uc = UNIT_CLASS.WIZARD;
+
+            if (objNm.EndsWith("U"))
+                btn.onClick.AddListener(() => _gameMgr.UpgradeUnit(objNm, uc.Value));
+            else
+                btn.onClick.AddListener(() => _gameMgr.BuyUnit(objNm, uc.Value));
         }
     }
 
