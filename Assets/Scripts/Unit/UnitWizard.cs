@@ -41,7 +41,10 @@ public class UnitWizard : Unit
 
         if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
         {
-            _ani.SetBool("LWAttack", true);
+            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
+                _ani.SetBool("LWAttack", true);
+            else
+                _ani.SetTrigger("LWBaseAttack");
             _isAttacking = true;
 
             // 마법공격효과
@@ -61,7 +64,8 @@ public class UnitWizard : Unit
         }
         else
         {
-            _ani.SetBool("LWAttack", false);
+            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
+                _ani.SetBool("LWAttack", false);
         }
     }
 }

@@ -13,6 +13,7 @@ public class UnitConfig
     public int _power = 1;
     public int _level = 1;
     public List<GameObject> _enemyObjList = null;
+    public GameObject _enemyBase;
 
     public TEAM _team = TEAM.BLUE;
     public UNIT_CLASS _unitClass = UNIT_CLASS.SWORD;

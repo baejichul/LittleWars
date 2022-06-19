@@ -6996,9 +6996,10 @@ GameObject:
   - component: {fileID: 1304951922}
   - component: {fileID: 1304951925}
   - component: {fileID: 1304951924}
+  - component: {fileID: 1304951926}
   m_Layer: 8
   m_Name: BaseBlue
-  m_TagString: BaseBlue
+  m_TagString: BLUE
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7083,7 +7084,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 1}
+  m_Offset: {x: -0.5, y: 1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
@@ -7094,7 +7095,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 1.7, y: 2}
   m_EdgeRadius: 0
 --- !u!114 &1304951925
 MonoBehaviour:
@@ -7108,8 +7109,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86df80484725cf6469382862787c8384, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cost: 0
-  _maxCost: 10
+  _hp: 0
+  _maxHp: 1000000
+  _team: 8
+  _gMgr: {fileID: 0}
+  _sndMgr: {fileID: 0}
+  _targetHpBar: {fileID: 0}
+  _ani: {fileID: 0}
+  _hpBarOffset: {x: -0.25, y: 1.1, z: 0}
+--- !u!95 &1304951926
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304951921}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 75ece8f30f9c0b04c9ea3943a9ada05b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1305352191
 GameObject:
   m_ObjectHideFlags: 0
@@ -8015,9 +8042,10 @@ GameObject:
   - component: {fileID: 1414612351}
   - component: {fileID: 1414612354}
   - component: {fileID: 1414612353}
+  - component: {fileID: 1414612355}
   m_Layer: 9
   m_Name: BaseRed
-  m_TagString: BaseRed
+  m_TagString: RED
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -8102,7 +8130,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 1}
+  m_Offset: {x: 0.5, y: 1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
@@ -8113,7 +8141,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 1.7, y: 2}
   m_EdgeRadius: 0
 --- !u!114 &1414612354
 MonoBehaviour:
@@ -8127,8 +8155,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86df80484725cf6469382862787c8384, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cost: 0
-  _maxCost: 10
+  _hp: 0
+  _maxHp: 1000000
+  _team: 8
+  _gMgr: {fileID: 0}
+  _sndMgr: {fileID: 0}
+  _targetHpBar: {fileID: 0}
+  _ani: {fileID: 0}
+  _hpBarOffset: {x: -0.25, y: 1.1, z: 0}
+--- !u!95 &1414612355
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414612350}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a7d4fa63c02df3c498b6cd66709c971a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1426612327
 GameObject:
   m_ObjectHideFlags: 0

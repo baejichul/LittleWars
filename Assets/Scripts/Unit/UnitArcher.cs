@@ -38,6 +38,7 @@ public class UnitArcher : Unit
 
         Vector3 vecCol = enemyObj.transform.position;
         float colPos = vecCol.x;
+        // Debug.Log("enemyObj.name = " + enemyObj.name);
 
         if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
         {
@@ -46,13 +47,17 @@ public class UnitArcher : Unit
             Arrow.SetActive(true);
             Arrow.transform.Translate(_weaponConfig._speed* Time.deltaTime, 0.0f, 0.0f);
 
-            // Debug.LogFormat("gameObject : {0}, enemyObj: {1}", gameObject.name, enemyObj.name);
-            _ani.SetBool("LWAttack", true);
+            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
+                _ani.SetBool("LWAttack", true);
+            else
+                _ani.SetTrigger("LWBaseAttack");
+
             _isAttacking = true;
         }
         else
         {
-            _ani.SetBool("LWAttack", false);
+            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
+                _ani.SetBool("LWAttack", false);
         }
     }
 }

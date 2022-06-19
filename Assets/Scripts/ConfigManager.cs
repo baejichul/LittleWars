@@ -52,6 +52,7 @@ public enum WEAPON : uint
     MAGIC
 }
 
+
 public class ConfigManager : MonoBehaviour
 {
     // camera

@@ -121,7 +121,8 @@ public class Unit : MonoBehaviour
                 _unitConfig._enemyObjList.AddRange(enemyArr);
                 foreach ( GameObject gObj in enemyArr)
                 {
-                    gObj.GetComponent<Unit>()._unitConfig._enemyObjList.Add(gameObject);
+                    if ( !gObj.transform.parent.gameObject.name.Equals("BaseGroup") )
+                        gObj.GetComponent<Unit>()._unitConfig._enemyObjList.Add(gameObject);
                 }
             }
         }
@@ -135,7 +136,8 @@ public class Unit : MonoBehaviour
                 _unitConfig._enemyObjList.AddRange(enemyArr);
                 foreach (GameObject gObj in enemyArr)
                 {
-                    gObj.GetComponent<Unit>()._unitConfig._enemyObjList.Add(gameObject);
+                    if (!gObj.transform.parent.gameObject.name.Equals("BaseGroup"))
+                        gObj.GetComponent<Unit>()._unitConfig._enemyObjList.Add(gameObject);
                 }
             }   
         }
@@ -238,31 +240,37 @@ public class Unit : MonoBehaviour
     // 가장 가까이 있는 적 찾기
     GameObject FindEnemy()
     {
-        float? minPosX = null;
+        float distance = 0.0f;
         GameObject rtnObj = null;
 
         Vector3 myObj = gameObject.transform.position;      
         float myPosX = myObj.x;
 
+        int i = 0;
         foreach (GameObject obj in _unitConfig._enemyObjList)
         {
             if (obj != null)
             {
                 Vector3 eyObj = obj.transform.position;
                 float posX = eyObj.x;
-                if (!minPosX.HasValue)
+
+                if (i ==0)
                 {
-                    minPosX = Mathf.Abs(myPosX - posX);
+                    distance = Mathf.Abs(myPosX - posX);
                     rtnObj = obj;
                 }
-                else if (minPosX > Mathf.Abs(myPosX - posX))
+                else if (distance > Mathf.Abs(myPosX - posX))
                 {
-                    minPosX = Mathf.Abs(myPosX - posX);
+                    distance = Mathf.Abs(myPosX - posX);
                     rtnObj = obj;
                 }
+                i++;
             }
         }
-        
+
+        Debug.Log("return rtnObj = " + rtnObj.name);
+
+
         return rtnObj;
     }
 
@@ -276,48 +284,78 @@ public class Unit : MonoBehaviour
         Vector3 vecCol = enemyObj.transform.position;
         float colPos = vecCol.x;
 
+        // Debug.LogFormat("attackRange : {0}, myPos : {1}, colPos : {2}, distance : {3}", _unitConfig._attackRange, myPos, colPos, Mathf.Abs(myPos - colPos));
+        // Debug.LogFormat("Distance : " + Mathf.Abs(myPos - colPos));
+
         if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
         {
-            // Debug.LogFormat("gameObject : {0}, enemyObj: {1}", gameObject.name, enemyObj.name);
-            _ani.SetBool("LWAttack", true);
+            if( enemyObj.transform.parent.gameObject.name.Equals("Unit"))
+                _ani.SetBool("LWAttack", true);
+            else
+                _ani.SetTrigger("LWBaseAttack");
+
             _isAttacking = true;
             DoDamage(enemyObj, _unitConfig._power);
         }
         else
         {
-            _ani.SetBool("LWAttack", false);
+            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
+                _ani.SetBool("LWAttack", false);
+
             _isAttacking = false;
         }
+        // Debug.LogFormat("LWAttack : " + _ani.GetBool("LWAttack"));
+
     }
 
     // 데미지
     public void DoDamage(GameObject enemyObj, int damage)
     {
-        Unit enemyUnit = enemyObj.GetComponent<Unit>();
-        // UnitConfig enemyUC = enemyObj.GetComponent<UnitConfig>();
-        enemyUnit._unitConfig._hp = enemyUnit._unitConfig._hp - damage;
-        enemyUnit._unitConfig._hp = Math.Max(enemyUnit._unitConfig._hp, 0);
-        // Debug.Log(gameObject.name + " => damage = " + damage + " : _hp = " + enemyUnit._unitConfig._hp);
-
-        if (enemyUnit._unitConfig._hp == 0)
+        // Debug.Log("enemyObj.Name = " + enemyObj.transform.parent.gameObject.name);
+        if ( enemyObj.transform.parent.gameObject.name.Equals("BaseGroup"))
         {
-            _isAttacking = false;
-            DoDie(enemyUnit, enemyObj);
+            Base enemyBase = enemyObj.GetComponent<Base>();
+            enemyBase._hp = enemyBase._hp - damage;
+            enemyBase._hp = Math.Max(enemyBase._hp, 0);
+            if (enemyBase._hp == 0)
+            {
+                _isAttacking = false;
+                RemoveEnemy(enemyObj);
+                enemyBase.DoDestory();
+            }
+            else
+            {
+                enemyBase.UpdateHpBar(enemyBase._targetHpBar);
+                enemyBase._ani.SetTrigger("LWHit");
+            }
         }
         else
         {
-            UpdateHpBar(enemyUnit._targetHpBar, enemyUnit._unitConfig);
+            Unit enemyUnit = enemyObj.GetComponent<Unit>();
+            // UnitConfig enemyUC = enemyObj.GetComponent<UnitConfig>();
+            enemyUnit._unitConfig._hp = enemyUnit._unitConfig._hp - damage;
+            enemyUnit._unitConfig._hp = Math.Max(enemyUnit._unitConfig._hp, 0);
+            // Debug.Log(gameObject.name + " => damage = " + damage + " : _hp = " + enemyUnit._unitConfig._hp);
 
-            enemyUnit._ani.SetTrigger("LWHit");
-            // _sndMgr.PlayAttack(_unitConfig._unitClass);
+            if (enemyUnit._unitConfig._hp == 0)
+            {
+                _isAttacking = false;
+                DoDie(enemyUnit, enemyObj);
+            }
+            else
+            {
+                UpdateHpBar(enemyUnit._targetHpBar, enemyUnit._unitConfig);
+
+                enemyUnit._ani.SetTrigger("LWHit");
+                // _sndMgr.PlayAttack(_unitConfig._unitClass);
+            }
         }
-
-
     }
 
     // 사망
     void DoDie(Unit enemyUnit, GameObject enemyObj)
     {
+        _ani.SetBool("LWAttack", false);
         enemyUnit._ani.SetBool("LWDie", true);
         RemoveEnemy(enemyObj);
         _sndMgr.Play("Deafeat");
