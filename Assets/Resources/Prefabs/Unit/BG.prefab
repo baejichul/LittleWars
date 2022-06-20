@@ -121,6 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f21a9da04ae1b1429aa4d0d67e3b97c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _isAttacking: 0
   _sndMgr: {fileID: 0}
   _unitConfig:
     _speed: 1
@@ -129,15 +130,18 @@ MonoBehaviour:
     _maxHp: 1000
     _power: 1
     _level: 1
-    _enemyObj: []
+    _enemyObjList: []
+    _enemyBase: {fileID: 0}
     _team: 8
     _unitClass: 0
     _weapon: 0
+    _hpBarOffset: {x: -0.25, y: 1.1, z: 0}
   _weaponConfig:
     _speed: 10
     _weapon: 0
     _damage: 0
     _defaultWeaponPos: {x: 0, y: 0, z: 0}
+  _targetHpBar: {fileID: 0}
 --- !u!61 &7304718199277395692
 BoxCollider2D:
   m_ObjectHideFlags: 0

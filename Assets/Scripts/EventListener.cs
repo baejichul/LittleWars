@@ -24,6 +24,7 @@ public class EventListener : MonoBehaviour
         SetDifficulty();
         SetCameraScroll();
         SetUnit();
+        SetReset();
     }
 
     void SetDifficulty()
@@ -47,6 +48,16 @@ public class EventListener : MonoBehaviour
         {
             Button btnPlay = gObjBtnHard.GetComponent<Button>();
             btnPlay.onClick.AddListener(() => _gameMgr.PlayGame(DIFFICULTY.HARD));
+        }
+    }
+
+    void SetReset()
+    {
+        GameObject gObjBtn = _endUI.transform.Find("BtnReset").gameObject;
+        if (gObjBtn is not null)
+        {
+            Button btnReset = gObjBtn.GetComponent<Button>();
+            btnReset.onClick.AddListener(() => _gameMgr.InitGame());
         }
     }
 

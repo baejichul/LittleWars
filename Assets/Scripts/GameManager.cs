@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     public bool _isClearEasy  = false;
     public bool _isClearNomal = false;
     public bool _isClearHard  = false;
+    public bool _isVictory = false;
 
     public ConfigManager _cfgMgr;
     public SoundManager _sndMgr;
@@ -49,8 +50,14 @@ public class GameManager : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {   
-        MoveTitleSet();
+    {
+        if ( _uiMode == UIMODE.INTRO )
+            MoveTitleSet("GameTitle");
+        else if (_uiMode == UIMODE.END && _isVictory == true)
+            MoveTitleSet("GameVictory");
+        else if (_uiMode == UIMODE.END && _isVictory == false)
+            MoveTitleSet("GameDefeat");
+
         MoveCamera();
         SetBlueMenu();
     }
@@ -59,19 +66,14 @@ public class GameManager : MonoBehaviour
     {
         MoveBackground();
     }
+    
 
-    void InitGame()
-    {   
-        if (_introUI != null)
-            InitGame(DIFFICULTY.EASY);
-    }
-
-    void InitGame(DIFFICULTY df)
+    public void InitGame()
     {   
         if (_introUI != null)
         {
+            _isVictory = false;
             _uiMode = UIMODE.INTRO;
-            _difficulty = df;
 
             _introUI.SetActive(true);
             _playUI.SetActive(false);
@@ -276,18 +278,27 @@ public class GameManager : MonoBehaviour
             _uiMode = UIMODE.END;
             _difficulty = df;
 
-            if (_difficulty == DIFFICULTY.EASY)
+            if (_isVictory == true && _difficulty == DIFFICULTY.EASY)
                 _isClearEasy = true;
-            else if (_difficulty == DIFFICULTY.NORMAL)
+            else if (_isVictory == true && _difficulty == DIFFICULTY.NORMAL)
                 _isClearNomal = true;
-            else if (_difficulty == DIFFICULTY.HARD)
+            else if (_isVictory == true && _difficulty == DIFFICULTY.HARD)
                 _isClearHard = true;
-            
-            DestoryAllUnit();
 
             _introUI.SetActive(false);
             _playUI.SetActive(false);
             _endUI.SetActive(true);
+
+
+            if (_isVictory)
+            {
+                _endUI.transform.Find("ImgVictory").gameObject.SetActive(true);
+            }
+            else
+            {
+                _endUI.transform.Find("ImgDefeat").gameObject.SetActive(true);
+            }
+            _endUI.transform.Find("BtnReset").gameObject.SetActive(true);
         }
     }
 
@@ -302,15 +313,15 @@ public class GameManager : MonoBehaviour
     {
         if (_uiMode == UIMODE.INTRO)
         {
-            Transform btnEasyTf = _introUI.transform.Find("ButtonEasy");
+            Transform btnEasyTf = _introUI.transform.Find("BtnEasy");
             if (btnEasyTf != null)
                 btnEasyTf.gameObject.transform.Find("Image").gameObject.SetActive(_isClearEasy);
 
-            Transform btnNormalTf = _introUI.transform.Find("ButtonNormal");
+            Transform btnNormalTf = _introUI.transform.Find("BtnNormal");
             if (btnNormalTf != null)
                 btnNormalTf.gameObject.transform.Find("Image").gameObject.SetActive(_isClearNomal);
 
-            Transform btnHardTf = _introUI.transform.Find("ButtonHard");
+            Transform btnHardTf = _introUI.transform.Find("BtnHard");
             if (btnHardTf != null)
                 btnHardTf.gameObject.transform.Find("Image").gameObject.SetActive(_isClearHard);
         }
@@ -333,13 +344,29 @@ public class GameManager : MonoBehaviour
     }
 
     // 타이틀셋 애니메이션
-    void MoveTitleSet()
+    void MoveTitleSet(string titleSet)
     {
-        if (_uiMode == UIMODE.INTRO)
+        if (titleSet.Equals("GameTitle") && _uiMode == UIMODE.INTRO)
         {
             _titleSetVal = _titleSetVal + 0.015f;
             // Debug.Log("val = " + titleSetVal + " : Mathf.Sin(val) = " + Mathf.Sin(titleSetVal));
             Transform titleTf = _introUI.transform.Find("TitleSet");
+            if (titleTf != null)
+                titleTf.Translate(new Vector3(0.0f, Mathf.Sin(_titleSetVal) * 0.15f, 0.0f));
+        }
+
+        if (titleSet.Equals("GameVictory") && _uiMode == UIMODE.END)
+        {
+            _titleSetVal = _titleSetVal + 0.015f;
+            Transform titleTf = _endUI.transform.Find("ImgVictory");
+            if (titleTf != null)
+                titleTf.Translate(new Vector3(0.0f, Mathf.Sin(_titleSetVal) * 0.15f, 0.0f));
+        }
+
+        if (titleSet.Equals("GameDefeat") && _uiMode == UIMODE.END)
+        {
+            _titleSetVal = _titleSetVal + 0.015f;
+            Transform titleTf = _endUI.transform.Find("ImgDefeat");
             if (titleTf != null)
                 titleTf.Translate(new Vector3(0.0f, Mathf.Sin(_titleSetVal) * 0.15f, 0.0f));
         }
@@ -483,7 +510,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void DestoryAllUnit()
+    public void DestoryAllUnit()
     {
         // Unit 삭제
         Transform[] childTfList = GameObject.Find("Unit").gameObject.GetComponentsInChildren<Transform>();
@@ -492,11 +519,21 @@ public class GameManager : MonoBehaviour
             // UNIT 게임오브젝트는 삭제하지 않는다.
             for (int i = 1; i < childTfList.Length; i++)
             {
-                // if( childTfList[i] != transform )      
-                    Destroy(childTfList[i].gameObject);
+                Debug.Log("gameObject NM : " + childTfList[i].gameObject.name);
+                Destroy(childTfList[i].gameObject);
             }
         }
-        
+
         // HPBar 삭제
+        Transform[] playUITfList = _playUI.GetComponentsInChildren<Transform>();
+        if (playUITfList is not null)
+        {
+            // UNIT 게임오브젝트는 삭제하지 않는다.
+            for (int i = 1; i < playUITfList.Length; i++)
+            {
+                if(playUITfList[i].gameObject.name.EndsWith("Base") || playUITfList[i].gameObject.name.EndsWith("Clone") )      
+                    Destroy(playUITfList[i].gameObject);
+            }
+        }
     }
 }

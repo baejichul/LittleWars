@@ -150,8 +150,7 @@ public class Unit : MonoBehaviour
             _unitConfig._speed = _unitConfig._speed * -1.0f;
             _weaponConfig._speed = _weaponConfig._speed * -1.0f;
             _unitConfig._hpBarOffset.x = _unitConfig._hpBarOffset.x * -1.0f;
-        }
-            
+        }   
     }
 
     void InitHpBar()
@@ -162,7 +161,7 @@ public class Unit : MonoBehaviour
             _hpBarObj = _gMgr._playUI.transform.Find("HpBarRed").gameObject;
 
         _targetHpBar = Instantiate(_hpBarObj,_gMgr._playUI.transform);
-        _targetHpBar.name = _hpBarObj.name;
+        _targetHpBar.name = _hpBarObj.name + "Clone";
         UpdateHpBarPos(_targetHpBar);
     }
 
@@ -183,7 +182,6 @@ public class Unit : MonoBehaviour
                 if (enemy != null)
                     DoAttack(enemy);
             }
-            
             
             if (_isAttacking == false)
             {
@@ -323,7 +321,8 @@ public class Unit : MonoBehaviour
             }
             else
             {
-                enemyBase.UpdateHpBar(enemyBase._targetHpBar);
+                // enemyBase.UpdateHpBar(enemyBase._targetHpBar);
+                // enemyBase.UpdateHealthBar(enemyBase._healthBar);
                 enemyBase._ani.SetTrigger("LWHit");
             }
         }
@@ -345,7 +344,9 @@ public class Unit : MonoBehaviour
                 UpdateHpBar(enemyUnit._targetHpBar, enemyUnit._unitConfig);
 
                 enemyUnit._ani.SetTrigger("LWHit");
-                _sndMgr.PlayAttack(_unitConfig._unitClass);
+
+                if (gameObject.layer == (int)TEAM.BLUE)
+                    _sndMgr.PlayAttack(_unitConfig._unitClass);
             }
         }
     }
@@ -356,7 +357,8 @@ public class Unit : MonoBehaviour
         _ani.SetBool("LWAttack", false);
         enemyUnit._ani.SetBool("LWDie", true);
         RemoveEnemy(enemyObj);
-        _sndMgr.Play("Defeat");
+        if (gameObject.layer == (int)TEAM.BLUE)
+            _sndMgr.Play("Defeat");
 
 
         // enemyObj.GetComponent<BoxCollider2D>().enabled = false;

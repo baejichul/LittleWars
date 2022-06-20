@@ -14,10 +14,15 @@ public class Base : MonoBehaviour
     
     GameObject _hpBarObj;
     public GameObject _targetHpBar;
+    public GameObject _healthBar;
+    public Text _healthBarText;
     public Animator _ani;
 
-
     public Vector3 _hpBarOffset;
+    public Vector2 _healthBarSize;
+
+    ParticleSystem _ps;
+    GameObject _destory;
 
     // Start is called before the first frame update
     void Start()
@@ -25,6 +30,13 @@ public class Base : MonoBehaviour
         _gMgr   = FindObjectOfType<GameManager>();
         _sndMgr = FindObjectOfType<SoundManager>();
         _ani = GetComponent<Animator>();
+
+        // 파티클 설정
+        if (transform.Find("Destory") != null)
+        {
+            _destory = transform.Find("Destory").gameObject;
+            _ps = _destory.GetComponent<ParticleSystem>();
+        }
 
         _hp = _maxHp;
         if (gameObject.layer == (int)TEAM.BLUE)
@@ -34,6 +46,7 @@ public class Base : MonoBehaviour
             _team = TEAM.RED;
 
         InitHpBar();
+        InitHealthBar();
     }
 
     // Update is called once per frame
@@ -41,6 +54,9 @@ public class Base : MonoBehaviour
     {
         if (_targetHpBar is not null)
             UpdateHpBarPos(_targetHpBar);
+
+        if (_healthBar is not null)
+            UpdateHealthBar(_healthBar);
     }
 
     void InitHpBar()
@@ -78,7 +94,37 @@ public class Base : MonoBehaviour
         if (hpBarObj.transform.Find("Hp") is not null)
             hpBarObj.transform.Find("Hp").gameObject.GetComponent<Image>().fillAmount = (float)_hp / (float)_maxHp;
     }
-    
+
+    void InitHealthBar()
+    {
+        if (gameObject.layer == (int)TEAM.BLUE)
+        {
+            _healthBar = _gMgr._playUI.transform.Find("HealthSet").transform.Find("BlueHealth").gameObject;
+            _healthBarText = _healthBar.transform.Find("EndPos").transform.Find("Image").transform.Find("Text").GetComponent<Text>();
+            _healthBarText.text = string.Format("{0}K", (double)_hp / 1000);
+        }
+        if (gameObject.layer == (int)TEAM.RED)
+        {
+            _healthBar = _gMgr._playUI.transform.Find("HealthSet").transform.Find("RedHealth").gameObject;
+            _healthBarText = _healthBar.transform.Find("EndPos").transform.Find("Image").transform.Find("Text").GetComponent<Text>();
+            _healthBarText.text = string.Format("{0}K", (double)_hp / 1000);
+        }
+
+        _healthBarSize = _healthBar.GetComponent<RectTransform>().sizeDelta;
+
+    }
+
+    public void UpdateHealthBar(GameObject healthBarObj)
+    {
+        if (healthBarObj is not null)
+        {
+            if (_hp > 0)
+                healthBarObj.GetComponent<RectTransform>().sizeDelta = new Vector2(_healthBarSize.x * (float)_hp / (float)_maxHp, _healthBarSize.y);
+
+            _healthBarText.text = string.Format("{0}K", (double)_hp / 1000);
+        }   
+    }
+
 
     public void DoDestory(TEAM team)
     {
@@ -86,14 +132,23 @@ public class Base : MonoBehaviour
         _sndMgr.Stop("BGM");
         // Debug.Log("WINNER = " + team.ToString());
 
+        if (_ps != null && !_ps.isEmitting)
+            _ps.Play();
+
         if (team == TEAM.BLUE)
+        {
             _sndMgr.Play("Victory");
+            _gMgr._isVictory = true;
+        }
         else
+        {
             _sndMgr.Play("Defeat");
+            _gMgr._isVictory = false;
+        }
 
-        Destroy(_targetHpBar);
-        Destroy(gameObject);
-
+        // Destroy(_targetHpBar);
+        
+        _gMgr.DestoryAllUnit();
         _gMgr.EndGame(_gMgr._difficulty);
     }
 }
