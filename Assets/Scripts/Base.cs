@@ -34,7 +34,6 @@ public class Base : MonoBehaviour
             _team = TEAM.RED;
 
         InitHpBar();
-        // StartCoroutine("IncreaseCost");
     }
 
     // Update is called once per frame
@@ -81,13 +80,20 @@ public class Base : MonoBehaviour
     }
     
 
-    public void DoDestory()
+    public void DoDestory(TEAM team)
     {
         _ani.SetBool("LWDie", true);
-        // _sndMgr.Play("Deafeat");
-        _sndMgr.Play("Victory");
-        
+        _sndMgr.Stop("BGM");
+        // Debug.Log("WINNER = " + team.ToString());
+
+        if (team == TEAM.BLUE)
+            _sndMgr.Play("Victory");
+        else
+            _sndMgr.Play("Defeat");
+
         Destroy(_targetHpBar);
-        Destroy(gameObject, 1.0f);
+        Destroy(gameObject);
+
+        _gMgr.EndGame(_gMgr._difficulty);
     }
 }

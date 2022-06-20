@@ -5,12 +5,14 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public bool _isClearEasy;
-    public bool _isClearNomal;
-    public bool _isClearHard;
+    public bool _isClearEasy  = false;
+    public bool _isClearNomal = false;
+    public bool _isClearHard  = false;
 
     public ConfigManager _cfgMgr;
     public SoundManager _sndMgr;
+    public PatternManager _ptnMgr;
+
     GameObject _canvas;
     GameObject _baseGroup;
     GameObject _backGroup;
@@ -38,6 +40,7 @@ public class GameManager : MonoBehaviour
     {
         _cfgMgr = FindObjectOfType<ConfigManager>();
         _sndMgr = FindObjectOfType<SoundManager>();
+        _ptnMgr = FindObjectOfType<PatternManager>();
         _camera = GameObject.FindGameObjectWithTag("MainCamera");
 
         InitGameUIObject();
@@ -113,30 +116,10 @@ public class GameManager : MonoBehaviour
             _endUI.SetActive(false);
 
             setActiveBase(true);
-            // StartCoroutine("IncreaseCost");
-            // StartCoroutine(IncreaseCost());
             Invoke("IncreaseCostNow", 2.0f);
 
-            imgCost = _playUI.transform.Find("ControlSet").transform.Find("ImgCost");
-            if (imgCost is not null)
-            {
-                Vector2 vec = imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta;
-                _maxBarwidth = vec.x;               // 최대값 저장
-
-                imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, vec.y);      // 0으로 초기화
-            }
-            
-        }
-    }
-
-    // 2초 간격으로 Cost 증가
-    IEnumerator IncreaseCost()
-    {   
-        while (_cost < _maxCost)
-        {
-            yield return new WaitForSeconds(2.0f);
-            _cost = _cost + 1;
-            SetCostBar();
+            InitCostBar();
+            InitEnemyAI(df);
         }
     }
 
@@ -148,8 +131,24 @@ public class GameManager : MonoBehaviour
             _cost = _cost + 1;
             // SetCostBar();
         }
-
         Invoke("IncreaseCostNow", 2.0f);
+    }
+
+    void InitCostBar()
+    {
+        imgCost = _playUI.transform.Find("ControlSet").transform.Find("ImgCost");
+        if (imgCost is not null)
+        {
+            Vector2 vec = imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta;
+            _maxBarwidth = vec.x;               // 최대값 저장
+
+            imgCost.Find("Bar").GetComponent<RectTransform>().sizeDelta = new Vector2(0.0f, vec.y);      // 0으로 초기화
+        }
+    }
+
+    void InitEnemyAI(DIFFICULTY df)
+    {
+        _ptnMgr.Init(df);
     }
 
     void SetBlueMenu()
@@ -276,6 +275,15 @@ public class GameManager : MonoBehaviour
         {
             _uiMode = UIMODE.END;
             _difficulty = df;
+
+            if (_difficulty == DIFFICULTY.EASY)
+                _isClearEasy = true;
+            else if (_difficulty == DIFFICULTY.NORMAL)
+                _isClearNomal = true;
+            else if (_difficulty == DIFFICULTY.HARD)
+                _isClearHard = true;
+            
+            DestoryAllUnit();
 
             _introUI.SetActive(false);
             _playUI.SetActive(false);
@@ -442,7 +450,7 @@ public class GameManager : MonoBehaviour
         else
         {
             _targetObj.SetActive(true);
-            _sndMgr.Play("Buy");
+            // _sndMgr.Play("Buy");
         }
     }
 
@@ -471,7 +479,24 @@ public class GameManager : MonoBehaviour
         else
         {
             _targetObj.SetActive(true);
-            _sndMgr.Play("Buy");
+            // _sndMgr.Play("Upgrade");
         }
+    }
+
+    void DestoryAllUnit()
+    {
+        // Unit 삭제
+        Transform[] childTfList = GameObject.Find("Unit").gameObject.GetComponentsInChildren<Transform>();
+        if ( childTfList is not null)
+        {
+            // UNIT 게임오브젝트는 삭제하지 않는다.
+            for (int i = 1; i < childTfList.Length; i++)
+            {
+                // if( childTfList[i] != transform )      
+                    Destroy(childTfList[i].gameObject);
+            }
+        }
+        
+        // HPBar 삭제
     }
 }

@@ -267,9 +267,7 @@ public class Unit : MonoBehaviour
                 i++;
             }
         }
-
-        Debug.Log("return rtnObj = " + rtnObj.name);
-
+        // Debug.Log("return rtnObj = " + rtnObj.name);
 
         return rtnObj;
     }
@@ -321,7 +319,7 @@ public class Unit : MonoBehaviour
             {
                 _isAttacking = false;
                 RemoveEnemy(enemyObj);
-                enemyBase.DoDestory();
+                enemyBase.DoDestory(_unitConfig._team);
             }
             else
             {
@@ -347,7 +345,7 @@ public class Unit : MonoBehaviour
                 UpdateHpBar(enemyUnit._targetHpBar, enemyUnit._unitConfig);
 
                 enemyUnit._ani.SetTrigger("LWHit");
-                // _sndMgr.PlayAttack(_unitConfig._unitClass);
+                _sndMgr.PlayAttack(_unitConfig._unitClass);
             }
         }
     }
@@ -358,7 +356,7 @@ public class Unit : MonoBehaviour
         _ani.SetBool("LWAttack", false);
         enemyUnit._ani.SetBool("LWDie", true);
         RemoveEnemy(enemyObj);
-        _sndMgr.Play("Deafeat");
+        _sndMgr.Play("Defeat");
 
 
         // enemyObj.GetComponent<BoxCollider2D>().enabled = false;

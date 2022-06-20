@@ -107,8 +107,6 @@ public class EventListener : MonoBehaviour
                 btn.onClick.AddListener(() => _gameMgr.UpgradeUnit(objNm, uc.Value));
             else
                 btn.onClick.AddListener(() => _gameMgr.BuyUnit(objNm, uc.Value));
-
-
         }
 
         Button[] btnRedTeam  = _controlSet.Find("RedTeam").GetComponentsInChildren<Button>();
