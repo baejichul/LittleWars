@@ -22,7 +22,7 @@ public class PatternManager : MonoBehaviour
 
         if (_diff == DIFFICULTY.EASY)
         {
-            _duration = 1.0f;   //6.0f
+            _duration = 6.0f;   //6.0f
             _unitCnt = 10;
         }
         else if (_diff == DIFFICULTY.NORMAL)
@@ -32,7 +32,7 @@ public class PatternManager : MonoBehaviour
         }
         else if (_diff == DIFFICULTY.HARD)
         {
-            _duration = 1.0f;   //4.0f
+            _duration = 4.0f;   //4.0f
             _unitCnt = 50;
         }
 
@@ -45,7 +45,8 @@ public class PatternManager : MonoBehaviour
         {
             _cnt++;
             yield return new WaitForSeconds(_duration);
-            CreatePattern();
+            if (_gMgr._uiMode == UIMODE.PLAY)
+                CreatePattern();
         }
     }
 

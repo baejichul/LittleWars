@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public bool _isClearEasy  = false;
-    public bool _isClearNomal = false;
-    public bool _isClearHard  = false;
-    public bool _isVictory = false;
+    public static bool _isClearEasy  = false;
+    public static bool _isClearNomal = false;
+    public static bool _isClearHard  = false;
+    public static bool _isVictory  = false;
 
     public ConfigManager _cfgMgr;
     public SoundManager _sndMgr;
@@ -67,12 +68,15 @@ public class GameManager : MonoBehaviour
         MoveBackground();
     }
     
+    public void setVictory(bool val)
+    {
+        _isVictory = val;
+    }
 
     public void InitGame()
     {   
         if (_introUI != null)
-        {
-            _isVictory = false;
+        {   
             _uiMode = UIMODE.INTRO;
 
             _introUI.SetActive(true);
@@ -110,6 +114,7 @@ public class GameManager : MonoBehaviour
     {
         if (_playUI != null)
         {
+            _isVictory = false;
             _uiMode = UIMODE.PLAY;
             _difficulty = df;
             
@@ -161,54 +166,56 @@ public class GameManager : MonoBehaviour
 
     void SetUpgradeBtn()
     {
-        GameObject btObj = _playUI.transform.Find("ControlSet").transform.Find("BlueTeam").gameObject;
-        if (btObj is not null)
+        if (_uiMode == UIMODE.PLAY)
         {
-            if (_cost >= _cfgMgr._cost[UNIT_CLASS.ARCHER] * _cfgMgr._upgradeCost)
+            GameObject btObj = _playUI.transform.Find("ControlSet").transform.Find("BlueTeam").gameObject;
+            if (btObj is not null)
             {
-                btObj.transform.Find("BtnBAU").GetComponent<Image>().enabled = true;
-                btObj.transform.Find("BtnBAU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
-            }
-            else
-            {
-                btObj.transform.Find("BtnBAU").GetComponent<Image>().enabled = false;
-                btObj.transform.Find("BtnBAU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
-            }
+                if (_cost >= _cfgMgr._cost[UNIT_CLASS.ARCHER] * _cfgMgr._upgradeCost)
+                {
+                    btObj.transform.Find("BtnBAU").GetComponent<Image>().enabled = true;
+                    btObj.transform.Find("BtnBAU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+                }
+                else
+                {
+                    btObj.transform.Find("BtnBAU").GetComponent<Image>().enabled = false;
+                    btObj.transform.Find("BtnBAU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+                }
 
-            if (_cost >= _cfgMgr._cost[UNIT_CLASS.GUARD] * _cfgMgr._upgradeCost)
-            {
-                btObj.transform.Find("BtnBGU").GetComponent<Image>().enabled = true;
-                btObj.transform.Find("BtnBGU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
-            }
-            else
-            {
-                btObj.transform.Find("BtnBGU").GetComponent<Image>().enabled = false;
-                btObj.transform.Find("BtnBGU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
-            }
+                if (_cost >= _cfgMgr._cost[UNIT_CLASS.GUARD] * _cfgMgr._upgradeCost)
+                {
+                    btObj.transform.Find("BtnBGU").GetComponent<Image>().enabled = true;
+                    btObj.transform.Find("BtnBGU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+                }
+                else
+                {
+                    btObj.transform.Find("BtnBGU").GetComponent<Image>().enabled = false;
+                    btObj.transform.Find("BtnBGU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+                }
 
-            if (_cost >= _cfgMgr._cost[UNIT_CLASS.SWORD] * _cfgMgr._upgradeCost)
-            {
-                btObj.transform.Find("BtnBSU").GetComponent<Image>().enabled = true;
-                btObj.transform.Find("BtnBSU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
-            }
-            else
-            {
-                btObj.transform.Find("BtnBSU").GetComponent<Image>().enabled = false;
-                btObj.transform.Find("BtnBSU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
-            }
+                if (_cost >= _cfgMgr._cost[UNIT_CLASS.SWORD] * _cfgMgr._upgradeCost)
+                {
+                    btObj.transform.Find("BtnBSU").GetComponent<Image>().enabled = true;
+                    btObj.transform.Find("BtnBSU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+                }
+                else
+                {
+                    btObj.transform.Find("BtnBSU").GetComponent<Image>().enabled = false;
+                    btObj.transform.Find("BtnBSU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+                }
 
-            if (_cost >= _cfgMgr._cost[UNIT_CLASS.WIZARD] * _cfgMgr._upgradeCost)
-            {
-                btObj.transform.Find("BtnBWU").GetComponent<Image>().enabled = true;
-                btObj.transform.Find("BtnBWU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
-            }
-            else
-            {
-                btObj.transform.Find("BtnBWU").GetComponent<Image>().enabled = false;
-                btObj.transform.Find("BtnBWU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+                if (_cost >= _cfgMgr._cost[UNIT_CLASS.WIZARD] * _cfgMgr._upgradeCost)
+                {
+                    btObj.transform.Find("BtnBWU").GetComponent<Image>().enabled = true;
+                    btObj.transform.Find("BtnBWU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = true;
+                }
+                else
+                {
+                    btObj.transform.Find("BtnBWU").GetComponent<Image>().enabled = false;
+                    btObj.transform.Find("BtnBWU").gameObject.transform.Find("Image").GetComponent<Image>().enabled = false;
+                }
             }
         }
-        
     }
        
 
@@ -291,15 +298,16 @@ public class GameManager : MonoBehaviour
 
 
             if (_isVictory)
-            {
                 _endUI.transform.Find("ImgVictory").gameObject.SetActive(true);
-            }
             else
-            {
                 _endUI.transform.Find("ImgDefeat").gameObject.SetActive(true);
-            }
             _endUI.transform.Find("BtnReset").gameObject.SetActive(true);
         }
+    }
+
+    public void ResetGame()
+    {
+        SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
     }
 
     public GameObject GetGameUIObject(string uiName)
@@ -315,15 +323,26 @@ public class GameManager : MonoBehaviour
         {
             Transform btnEasyTf = _introUI.transform.Find("BtnEasy");
             if (btnEasyTf != null)
+            {
+                btnEasyTf.gameObject.GetComponent<Button>().enabled = !_isClearEasy;
                 btnEasyTf.gameObject.transform.Find("Image").gameObject.SetActive(_isClearEasy);
+            }
+
 
             Transform btnNormalTf = _introUI.transform.Find("BtnNormal");
             if (btnNormalTf != null)
+            {
+                    btnNormalTf.gameObject.GetComponent<Button>().enabled = !_isClearNomal;
                 btnNormalTf.gameObject.transform.Find("Image").gameObject.SetActive(_isClearNomal);
+            }
+                
 
             Transform btnHardTf = _introUI.transform.Find("BtnHard");
             if (btnHardTf != null)
+            {
+                btnHardTf.gameObject.GetComponent<Button>().enabled = !_isClearHard;
                 btnHardTf.gameObject.transform.Find("Image").gameObject.SetActive(_isClearHard);
+            }
         }
     }
 
@@ -516,10 +535,11 @@ public class GameManager : MonoBehaviour
         Transform[] childTfList = GameObject.Find("Unit").gameObject.GetComponentsInChildren<Transform>();
         if ( childTfList is not null)
         {
+            // Debug.Log("gameObject Length : " + childTfList.Length);
             // UNIT 게임오브젝트는 삭제하지 않는다.
             for (int i = 1; i < childTfList.Length; i++)
             {
-                Debug.Log("gameObject NM : " + childTfList[i].gameObject.name);
+                // Debug.Log("gameObject NM : " + childTfList[i].gameObject.name);
                 Destroy(childTfList[i].gameObject);
             }
         }
@@ -528,10 +548,11 @@ public class GameManager : MonoBehaviour
         Transform[] playUITfList = _playUI.GetComponentsInChildren<Transform>();
         if (playUITfList is not null)
         {
-            // UNIT 게임오브젝트는 삭제하지 않는다.
+            // Debug.Log("gameObject Length : " + playUITfList.Length);
             for (int i = 1; i < playUITfList.Length; i++)
             {
-                if(playUITfList[i].gameObject.name.EndsWith("Base") || playUITfList[i].gameObject.name.EndsWith("Clone") )      
+                // Debug.Log("gameObject NM : " + playUITfList[i].gameObject.name);
+                if (playUITfList[i].gameObject.name.EndsWith("Base") || playUITfList[i].gameObject.name.EndsWith("Clone") )      
                     Destroy(playUITfList[i].gameObject);
             }
         }

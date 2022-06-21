@@ -321,8 +321,8 @@ public class Unit : MonoBehaviour
             }
             else
             {
-                // enemyBase.UpdateHpBar(enemyBase._targetHpBar);
-                // enemyBase.UpdateHealthBar(enemyBase._healthBar);
+                enemyBase.UpdateHpBar(enemyBase._targetHpBar);
+                enemyBase.UpdateHealthBar(enemyBase._healthBar);
                 enemyBase._ani.SetTrigger("LWHit");
             }
         }

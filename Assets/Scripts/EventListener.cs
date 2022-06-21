@@ -57,7 +57,8 @@ public class EventListener : MonoBehaviour
         if (gObjBtn is not null)
         {
             Button btnReset = gObjBtn.GetComponent<Button>();
-            btnReset.onClick.AddListener(() => _gameMgr.InitGame());
+            // btnReset.onClick.AddListener(() => _gameMgr.InitGame());
+            btnReset.onClick.AddListener(() => _gameMgr.ResetGame());
         }
     }
 

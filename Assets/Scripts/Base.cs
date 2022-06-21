@@ -37,8 +37,9 @@ public class Base : MonoBehaviour
             _destory = transform.Find("Destory").gameObject;
             _ps = _destory.GetComponent<ParticleSystem>();
         }
-
+        
         _hp = _maxHp;
+        // Debug.Log($"after _hp = {_hp} _maxHp = {_maxHp}");
         if (gameObject.layer == (int)TEAM.BLUE)
             _team = TEAM.BLUE;
 
@@ -54,9 +55,6 @@ public class Base : MonoBehaviour
     {
         if (_targetHpBar is not null)
             UpdateHpBarPos(_targetHpBar);
-
-        if (_healthBar is not null)
-            UpdateHealthBar(_healthBar);
     }
 
     void InitHpBar()
@@ -110,6 +108,7 @@ public class Base : MonoBehaviour
             _healthBarText.text = string.Format("{0}K", (double)_hp / 1000);
         }
 
+        // Debug.Log("InitHealthBar_hp = " + _hp);
         _healthBarSize = _healthBar.GetComponent<RectTransform>().sizeDelta;
 
     }
@@ -135,20 +134,20 @@ public class Base : MonoBehaviour
         if (_ps != null && !_ps.isEmitting)
             _ps.Play();
 
+        bool isVictory;
         if (team == TEAM.BLUE)
         {
             _sndMgr.Play("Victory");
-            _gMgr._isVictory = true;
+            isVictory = true;
         }
         else
         {
             _sndMgr.Play("Defeat");
-            _gMgr._isVictory = false;
+            isVictory = false;
         }
 
-        // Destroy(_targetHpBar);
-        
         _gMgr.DestoryAllUnit();
+        _gMgr.setVictory(isVictory);
         _gMgr.EndGame(_gMgr._difficulty);
     }
 }
