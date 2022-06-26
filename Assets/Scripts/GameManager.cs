@@ -238,8 +238,17 @@ public class GameManager : MonoBehaviour
     void SetPortrait(string gameObjNm, UNIT_CLASS uc)
     {
         // 이미지 설정
+        Sprite sp = null;
         string resourceNm = "Portrait " + gameObjNm.Substring(1);
-        Sprite sp = Resources.Load<Sprite>(_cfgMgr.defaultSpritesUIPath + resourceNm);
+        Sprite[] spArr = Resources.LoadAll<Sprite>(_cfgMgr.defaultSpritesUIPath);
+        foreach (Sprite sprite in spArr)
+        {
+            if (sprite.name.Equals(resourceNm))
+            {
+                sp = sprite;
+                break;
+            }
+        }
 
         // HP, POWER, COST 설정
         Unit ut = _targetObj.GetComponent<Unit>();

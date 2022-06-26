@@ -20,6 +20,15 @@ public class Weapon : MonoBehaviour
         
     }
 
+    void InstantiateArrow(GameObject gameObj, Transform parentTf)
+    {
+        // 화살 복제
+        GameObject gObj = Instantiate(gameObj, parentTf);
+        gObj.transform.position = parentTf.transform.Find("ArrowDefaultPos").transform.position;
+        gObj.name = "Arrow";
+        gObj.SetActive(false);
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         _myUnit = transform.parent.GetComponent<Unit>();
@@ -34,12 +43,7 @@ public class Weapon : MonoBehaviour
                     // Debug.LogFormat("collision.gameObject.layer : {0} , collision.gameObject : {1}, _myUnit._weaponConfig._damage : {2}", collision.gameObject.layer, collision.gameObject.name, _myUnit._weaponConfig._damage);
                     _myUnit.DoDamage(collision.gameObject, _myUnit._weaponConfig._damage);
 
-                    // 화살 복제
-                    GameObject gObj = Instantiate(gameObject, transform.parent);
-                    gObj.transform.position = transform.parent.transform.Find("ArrowDefaultPos").transform.position;
-                    gObj.name = "Arrow";
-                    gObj.SetActive(false);
-
+                    InstantiateArrow(gameObject, transform.parent);
                     Destroy(gameObject);
                 }
             }
@@ -55,12 +59,7 @@ public class Weapon : MonoBehaviour
                     // Debug.LogFormat("collision.gameObject.layer : {0} , collision.gameObject : {1}, _myUnit._weaponConfig._damage : {2}", collision.gameObject.layer, collision.gameObject.name, _myUnit._weaponConfig._damage);
                     _myUnit.DoDamage(collision.gameObject, _myUnit._weaponConfig._damage);
 
-                    // 화살 복제
-                    GameObject gObj = Instantiate(gameObject, transform.parent);
-                    gObj.transform.position = transform.parent.transform.Find("ArrowDefaultPos").transform.position;
-                    gObj.name = "Arrow";
-                    gObj.SetActive(false);
-
+                    InstantiateArrow(gameObject, transform.parent);
                     Destroy(gameObject);
                 }
             }

@@ -25,6 +25,7 @@ public class UnitArcher : Unit
     public override void InitWeaponConfig(int level)
     {
         _weaponConfig._speed = 5.0f + (level - 1) * 0.1f;
+        _weaponConfig._duration = 0.5f - (level - 1) * 0.1f;
         _weaponConfig._weapon = WEAPON.ARROW;
         _weaponConfig._damage = 5000 + (level - 1) * 1000;
     }
@@ -44,8 +45,7 @@ public class UnitArcher : Unit
         {
             //화살을 발사한다.
             GameObject Arrow = transform.Find("Arrow").gameObject;
-            Arrow.SetActive(true);
-            Arrow.transform.Translate(_weaponConfig._speed* Time.deltaTime, 0.0f, 0.0f);
+            StartCoroutine(DoShotArrow(Arrow));
 
             if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
                 _ani.SetBool("LWAttack", true);
@@ -58,6 +58,17 @@ public class UnitArcher : Unit
         {
             if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
                 _ani.SetBool("LWAttack", false);
+        }
+    }
+
+    IEnumerator DoShotArrow(GameObject Arrow)
+    {
+        yield return new WaitForSeconds(_weaponConfig._duration);
+        if (Arrow != null)
+        {
+            Arrow.SetActive(true);
+            Arrow.transform.Translate(_weaponConfig._speed * Time.deltaTime, 0.0f, 0.0f);
+            StopCoroutine(DoShotArrow(Arrow));
         }
     }
 }

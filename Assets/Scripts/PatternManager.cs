@@ -27,13 +27,13 @@ public class PatternManager : MonoBehaviour
         }
         else if (_diff == DIFFICULTY.NORMAL)
         {
-            _duration = 5.0f;
+            _duration = 5.5f;
             _unitCnt = 20;
         }
         else if (_diff == DIFFICULTY.HARD)
         {
-            _duration = 4.0f;   //4.0f
-            _unitCnt = 50;
+            _duration = 5.0f;
+            _unitCnt = 30;
         }
 
         StartCoroutine(SetPattern());
