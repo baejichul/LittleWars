@@ -22,17 +22,17 @@ public class PatternManager : MonoBehaviour
 
         if (_diff == DIFFICULTY.EASY)
         {
-            _duration = 6.0f;   //6.0f
+            _duration = 7.0f;   //6.0f
             _unitCnt = 10;
         }
         else if (_diff == DIFFICULTY.NORMAL)
         {
-            _duration = 5.5f;
+            _duration = 6.5f;
             _unitCnt = 20;
         }
         else if (_diff == DIFFICULTY.HARD)
         {
-            _duration = 5.0f;
+            _duration = 6.0f;
             _unitCnt = 30;
         }
 
@@ -55,6 +55,7 @@ public class PatternManager : MonoBehaviour
         if (_diff == DIFFICULTY.EASY)
         {
             int rnClass = Random.Range(0, 4);
+            // int rnClass = 0;
             int isBuy = Random.Range(0, 4);
             _unitClass = GetUnitClass(rnClass);
             gObjNm = GetGameObjNm(_unitClass, isBuy);

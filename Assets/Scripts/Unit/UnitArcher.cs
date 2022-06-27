@@ -43,21 +43,34 @@ public class UnitArcher : Unit
 
         if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
         {
-            //화살을 발사한다.
-            GameObject Arrow = transform.Find("Arrow").gameObject;
-            StartCoroutine(DoShotArrow(Arrow));
+            if ( enemyObj != null )
+            {
+                //화살을 발사한다.
+                GameObject Arrow = transform.Find("Arrow").gameObject;
+                // StartCoroutine(DoShotArrow(Arrow));
+                DoMoveArrow(Arrow);
 
-            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
-                _ani.SetBool("LWAttack", true);
-            else
-                _ani.SetTrigger("LWBaseAttack");
+                if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
+                    _ani.SetBool("LWAttack", true);
+                else
+                    _ani.SetTrigger("LWBaseAttack");
 
-            _isAttacking = true;
+                _isAttacking = true;
+            }
         }
         else
         {
             if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
                 _ani.SetBool("LWAttack", false);
+        }
+    }
+
+    void DoMoveArrow(GameObject Arrow)
+    {   
+        if (Arrow != null)
+        {
+            Arrow.SetActive(true);
+            Arrow.transform.Translate(_weaponConfig._speed * Time.deltaTime, 0.0f, 0.0f);
         }
     }
 

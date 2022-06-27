@@ -32,6 +32,7 @@ public class Weapon : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         _myUnit = transform.parent.GetComponent<Unit>();
+
         if (collision.gameObject.transform.parent.gameObject.name.Equals("Unit"))
         {
             _enemyUnit = collision.gameObject.GetComponent<Unit>();
@@ -39,8 +40,7 @@ public class Weapon : MonoBehaviour
             {
                 // if ( gameObject.name == "Arrow")
                 if (_myUnit._unitConfig._unitClass == UNIT_CLASS.ARCHER)
-                {
-                    // Debug.LogFormat("collision.gameObject.layer : {0} , collision.gameObject : {1}, _myUnit._weaponConfig._damage : {2}", collision.gameObject.layer, collision.gameObject.name, _myUnit._weaponConfig._damage);
+                {   
                     _myUnit.DoDamage(collision.gameObject, _myUnit._weaponConfig._damage);
 
                     InstantiateArrow(gameObject, transform.parent);
@@ -51,6 +51,7 @@ public class Weapon : MonoBehaviour
         else
         {
             _enemyBase = collision.gameObject.GetComponent<Base>();
+
             if (gameObject.layer != collision.gameObject.layer && _enemyBase != null)
             {
                 // if ( gameObject.name == "Arrow")
