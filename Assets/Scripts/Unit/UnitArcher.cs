@@ -32,37 +32,11 @@ public class UnitArcher : Unit
 
     // 공격
     protected override void DoAttack(GameObject enemyObj)
-    {
-        // 거리 측정
-        Vector3 vecObj = gameObject.transform.position;
-        float myPos = vecObj.x;
-
-        Vector3 vecCol = enemyObj.transform.position;
-        float colPos = vecCol.x;
-        // Debug.Log("enemyObj.name = " + enemyObj.name);
-
-        if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
-        {
-            if ( enemyObj != null )
-            {
-                //화살을 발사한다.
-                GameObject Arrow = transform.Find("Arrow").gameObject;
-                // StartCoroutine(DoShotArrow(Arrow));
-                DoMoveArrow(Arrow);
-
-                if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
-                    _ani.SetBool("LWAttack", true);
-                else
-                    _ani.SetTrigger("LWBaseAttack");
-
-                _isAttacking = true;
-            }
-        }
-        else
-        {
-            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
-                _ani.SetBool("LWAttack", false);
-        }
+    {   
+        //화살을 발사한다.
+        GameObject Arrow = transform.Find("Arrow").gameObject;
+        // StartCoroutine(DoShotArrow(Arrow));
+        DoMoveArrow(Arrow);
     }
 
     void DoMoveArrow(GameObject Arrow)
@@ -70,7 +44,9 @@ public class UnitArcher : Unit
         if (Arrow != null)
         {
             Arrow.SetActive(true);
-            Arrow.transform.Translate(_weaponConfig._speed * Time.deltaTime, 0.0f, 0.0f);
+            // Arrow.transform.Translate(_weaponConfig._speed * Time.deltaTime, 0.0f, 0.0f);
+            Rigidbody2D rigid = Arrow.GetComponent<Rigidbody2D>();
+            rigid.velocity = new Vector2(_weaponConfig._speed, 0.0f);
         }
     }
 

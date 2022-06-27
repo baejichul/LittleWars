@@ -174,13 +174,30 @@ public class Unit : MonoBehaviour
             if (_targetHpBar is not null)
                 UpdateHpBarPos(_targetHpBar);
             
-
-            // 항목삭제 후에도 _unitConfig._enemyObjList.Count 1이 되는 문제 발생
             if (_unitConfig._enemyObjList.Count > 0)
             {
                 GameObject enemy = FindEnemy();
                 if (enemy != null)
-                    DoAttack(enemy);
+                {
+                    float distance = CheckDistance(enemy);
+                    if (_unitConfig._attackRange >= distance)
+                    {
+                        _isAttacking = true;
+                        if (enemy.transform.parent.gameObject.name.Equals("Unit"))
+                            _ani.SetBool("LWAttack", true);
+                        else
+                            _ani.SetTrigger("LWBaseAttack");
+
+                        DoAttack(enemy);
+                    }
+                    else
+                    {
+                        _isAttacking = false;
+                        if (enemy.transform.parent.gameObject.name.Equals("Unit"))
+                            _ani.SetBool("LWAttack", false);
+                    }
+                    // Debug.LogFormat("LWAttack : " + _ani.GetBool("LWAttack"));
+                }
             }
             
             if (_isAttacking == false)
@@ -272,6 +289,11 @@ public class Unit : MonoBehaviour
 
     // 공격
     protected virtual void DoAttack(GameObject enemyObj)
+    {       
+        DoDamage(enemyObj, _unitConfig._power);
+    }
+
+    float CheckDistance(GameObject enemyObj)
     {
         // 거리 측정
         Vector3 vecObj = gameObject.transform.position;
@@ -283,25 +305,7 @@ public class Unit : MonoBehaviour
         // Debug.LogFormat("attackRange : {0}, myPos : {1}, colPos : {2}, distance : {3}", _unitConfig._attackRange, myPos, colPos, Mathf.Abs(myPos - colPos));
         // Debug.LogFormat("Distance : " + Mathf.Abs(myPos - colPos));
 
-        if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
-        {
-            if( enemyObj.transform.parent.gameObject.name.Equals("Unit"))
-                _ani.SetBool("LWAttack", true);
-            else
-                _ani.SetTrigger("LWBaseAttack");
-
-            _isAttacking = true;
-            DoDamage(enemyObj, _unitConfig._power);
-        }
-        else
-        {
-            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
-                _ani.SetBool("LWAttack", false);
-
-            _isAttacking = false;
-        }
-        // Debug.LogFormat("LWAttack : " + _ani.GetBool("LWAttack"));
-
+        return Mathf.Abs(myPos - colPos);
     }
 
     // 데미지
@@ -375,6 +379,8 @@ public class Unit : MonoBehaviour
     void RemoveEnemy(GameObject enemyObj)
     {   
         _unitConfig._enemyObjList.Remove(enemyObj);
+
+        Debug.Log($"_enemyObjList.Count = {_unitConfig._enemyObjList.Count}");
     }
 
     void UpdateHpBar(GameObject hpBarObj, UnitConfig unitConfig)
@@ -383,8 +389,7 @@ public class Unit : MonoBehaviour
         {
             hpBarObj.transform.Find("Hp").gameObject.GetComponent<Image>().fillAmount = (float)unitConfig._hp / (float)unitConfig._maxHp;
             // Debug.LogFormat("hpBarObj {0} : fillAmount {1}", hpBarObj.name, hpBarObj.transform.Find("Hp").gameObject.GetComponent<Image>().fillAmount);
-        }
-            
+        }   
     }
 
     void UpdateHpBarPos(GameObject hpBarObj)

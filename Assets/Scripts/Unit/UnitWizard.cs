@@ -32,40 +32,20 @@ public class UnitWizard : Unit
     // 공격
     protected override void DoAttack(GameObject enemyObj)
     {
-        // 거리 측정
-        Vector3 vecObj = gameObject.transform.position;
-        float myPos = vecObj.x;
+        // 마법공격효과
+        string magicObjNm = "Magic" + _unitConfig._team.ToString();
+        GameObject gObj = transform.Find(magicObjNm).gameObject;
+        gObj.SetActive(true);
 
         Vector3 vecCol = enemyObj.transform.position;
-        float colPos = vecCol.x;
-
-        if (_unitConfig._attackRange >= Mathf.Abs(myPos - colPos))
+        transform.Find(magicObjNm).position = new Vector3(vecCol.x, vecCol.y + 0.75f, vecCol.z);
+        if (gObj is not null)
         {
-            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
-                _ani.SetBool("LWAttack", true);
-            else
-                _ani.SetTrigger("LWBaseAttack");
-            _isAttacking = true;
-
-            // 마법공격효과
-            string magicObjNm = "Magic" + _unitConfig._team.ToString();
-            GameObject gObj = transform.Find(magicObjNm).gameObject;
-            gObj.SetActive(true);
-
-            transform.Find(magicObjNm).position = new Vector3(vecCol.x, vecCol.y + 0.75f, vecCol.z);
-            if (gObj is not null)
-            {
-                ParticleSystem psMagic = gObj.GetComponent<ParticleSystem>();
-                if (psMagic != null && !psMagic.isEmitting)
-                    psMagic.Play();
-            }                
-
-            DoDamage(enemyObj, _unitConfig._power);
+            ParticleSystem psMagic = gObj.GetComponent<ParticleSystem>();
+            if (psMagic != null && !psMagic.isEmitting)
+                psMagic.Play();
         }
-        else
-        {
-            if (enemyObj.transform.parent.gameObject.name.Equals("Unit"))
-                _ani.SetBool("LWAttack", false);
-        }
+
+        DoDamage(enemyObj, _unitConfig._power);
     }
 }

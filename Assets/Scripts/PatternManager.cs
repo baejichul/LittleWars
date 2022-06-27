@@ -23,7 +23,7 @@ public class PatternManager : MonoBehaviour
         if (_diff == DIFFICULTY.EASY)
         {
             _duration = 7.0f;   //6.0f
-            _unitCnt = 10;
+            _unitCnt = 5;
         }
         else if (_diff == DIFFICULTY.NORMAL)
         {
