@@ -27,37 +27,42 @@ public class Weapon : MonoBehaviour
         gObj.transform.position = parentTf.transform.Find("ArrowDefaultPos").transform.position;
         gObj.name = "Arrow";
         gObj.SetActive(false);
+
+        Destroy(gameObj);
+
+        // 화살이 복제는 됬지만 삭제가 되지 않는 상황 발생
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        _myUnit = transform.parent.GetComponent<Unit>();
-        if (collision.gameObject.transform.parent.gameObject.name.Equals("Unit"))
-        {
-            _enemyUnit = collision.gameObject.GetComponent<Unit>();
-            if (gameObject.layer != collision.gameObject.layer && _enemyUnit != null)
-            {
-                if ( gameObject.name == "Arrow")
-                {   
-                    _myUnit.DoDamage(collision.gameObject, _myUnit._weaponConfig._damage);
+        GameObject gObjParent = collision.transform.parent.gameObject;
 
-                    InstantiateArrow(gameObject, transform.parent);
-                    Destroy(gameObject);
+        if (gObjParent != null)
+        {
+            if (gObjParent.name == "Unit")
+            {
+                _myUnit    = transform.parent.GetComponent<Unit>();
+                _enemyUnit = collision.GetComponent<Unit>();
+                if (gameObject.layer != collision.gameObject.layer && _enemyUnit != null)
+                {
+                    if (gameObject.name == "Arrow")
+                    {
+                        _myUnit.DoDamage(collision.gameObject, _myUnit._weaponConfig._damage);
+                        InstantiateArrow(gameObject, transform.parent);
+                    }
                 }
             }
-        }
-        else
-        {
-            _enemyBase = collision.gameObject.GetComponent<Base>();
-            if (gameObject.layer != collision.gameObject.layer && _enemyBase != null)
+            else if ( gObjParent.name == "BaseGroup")
             {
-                if ( gameObject.name == "Arrow")
+                _myUnit    = transform.parent.GetComponent<Unit>();
+                _enemyBase = collision.GetComponent<Base>();
+                if (gameObject.layer != collision.gameObject.layer && _enemyBase != null)
                 {
-                    // Debug.LogFormat("collision.gameObject.layer : {0} , collision.gameObject : {1}, _myUnit._weaponConfig._damage : {2}", collision.gameObject.layer, collision.gameObject.name, _myUnit._weaponConfig._damage);
-                    _myUnit.DoDamage(collision.gameObject, _myUnit._weaponConfig._damage);
-
-                    InstantiateArrow(gameObject, transform.parent);
-                    Destroy(gameObject);
+                    if (gameObject.name == "Arrow")
+                    {
+                        _myUnit.DoDamage(collision.gameObject, _myUnit._weaponConfig._damage);
+                        InstantiateArrow(gameObject, transform.parent);
+                    }
                 }
             }
         }

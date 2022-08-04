@@ -368,7 +368,8 @@ public class Unit : MonoBehaviour
         // enemyObj.GetComponent<BoxCollider2D>().enabled = false;
         // enemyObj.GetComponent<SpriteRenderer>().sortingOrder = 1;
         Destroy(enemyUnit._targetHpBar);
-        Destroy(enemyObj,1.0f);
+        // Destroy(enemyObj,1.0f);
+        Destroy(enemyObj);
     }
 
     public void AddEnemy(GameObject enemyObj)
@@ -379,8 +380,7 @@ public class Unit : MonoBehaviour
     void RemoveEnemy(GameObject enemyObj)
     {   
         _unitConfig._enemyObjList.Remove(enemyObj);
-
-        Debug.Log($"_enemyObjList.Count = {_unitConfig._enemyObjList.Count}");
+        // Debug.Log($"_enemyObjList.Count = {_unitConfig._enemyObjList.Count}");
     }
 
     void UpdateHpBar(GameObject hpBarObj, UnitConfig unitConfig)
@@ -403,11 +403,10 @@ public class Unit : MonoBehaviour
             hpBarObj.transform.position = screenPos;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         // 충돌체가 아군이라면
         if ( collision.gameObject.layer == (int)_unitConfig._team )            
             DoStop(collision);
     }
-
 }
